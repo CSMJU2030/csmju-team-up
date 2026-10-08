@@ -18,7 +18,11 @@ async function generate(): Promise<void> {
     .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" })
     .build();
   const document = SwaggerModule.createDocument(app, documentConfig);
-  await writeFile(resolve(process.cwd(), "../openapi.json"), JSON.stringify(document, null, 2) + "\n", "utf8");
+  const output = JSON.stringify(document, null, 2) + "\n";
+  await Promise.all([
+    writeFile(resolve(process.cwd(), "../openapi.json"), output, "utf8"),
+    writeFile(resolve(process.cwd(), "openapi.json"), output, "utf8"),
+  ]);
   await app.close();
 }
 
