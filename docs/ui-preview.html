@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CS TeamUp — UI Preview · CSMJU 2030</title>
+  <style>
+    :root{font-family:"Noto Sans Thai","Segoe UI",system-ui,sans-serif;color:#1b1b20;background:#f7f7fb}
+    *{box-sizing:border-box}body{margin:0}.shell{display:flex;min-height:1100px}.side{width:260px;background:linear-gradient(155deg,#0d3c8a 0%,#0757bd 50%,#008bdf 100%);color:#fff;padding:24px 16px;position:relative}.logo{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:16px;padding:16px 14px}.logo strong{font-size:22px;display:block}.logo small{color:rgba(255,255,255,.72)}.back{margin:20px 6px;color:rgba(255,255,255,.84);font-size:14px}.new{display:flex;justify-content:center;align-items:center;gap:8px;background:linear-gradient(135deg,#14a7ff,#6c63ff);border:1px solid rgba(255,255,255,.25);padding:13px 16px;border-radius:10px;color:white;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.15)}nav{margin-top:22px}nav a{display:flex;gap:12px;align-items:center;color:rgba(255,255,255,.72);padding:13px 12px 13px 20px;text-decoration:none;border-left:4px solid transparent;border-radius:0 8px 8px 0}nav a.on{color:#fff;background:rgba(255,255,255,.12);border-left-color:#f4d35e}nav span{font-size:14px}.logout{position:absolute;left:16px;right:16px;bottom:18px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.28);padding:11px;border-radius:9px;font-weight:600}.main{flex:1;min-width:0}.top{height:66px;background:#fff;border-bottom:1px solid #e0e0e6;display:flex;align-items:center;justify-content:space-between;padding:0 44px;position:sticky;top:0}.search{width:400px;position:relative}.search input{width:100%;border:1px solid #d9d9e2;border-radius:999px;padding:10px 16px 10px 40px;font-size:14px;background:#fafbff}.search i{position:absolute;left:15px;top:10px;color:#777}.user{display:flex;gap:10px;align-items:center;color:#45454f}.avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#1d5ec8;color:#fff;font-weight:800}.content{padding:34px 44px 80px;max-width:1250px;margin:auto}.crumb{color:#71717b;font-size:13px}.head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-top:5px}.head h1{font-size:32px;margin:0 0 6px}.head p{margin:0;color:#707079}.action{background:linear-gradient(135deg,#0d5bd7,#6338c9);color:#fff;border:0;border-radius:10px;padding:12px 18px;font-weight:700}.tabs{display:flex;gap:4px;border-bottom:1px solid #e2e2e8;margin-top:28px}.tab{padding:11px 18px;border:0;background:transparent;color:#6f6f78;font-weight:600}.tab.on{color:#1758c2;border-bottom:3px solid #1758c2}.filters{background:#fff;border:1px solid #e1e1e7;border-radius:14px;padding:16px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:12px;margin-top:20px;box-shadow:0 4px 18px rgba(20,35,80,.04)}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:#565660}.field input,.field select{width:100%;height:40px;border:1px solid #d8d8e0;border-radius:9px;background:#fff;padding:8px 11px;color:#252530}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:20px}.card{background:#fff;border:1px solid #e0e0e6;border-radius:14px;padding:18px;box-shadow:0 3px 14px rgba(20,35,80,.035)}.row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.badge{padding:4px 9px;border-radius:999px;font-size:11px;font-weight:700}.blue{background:#e8f0ff;color:#1355bf}.green{background:#e8f8ef;color:#18854d}.gray{background:#f0f0f3;color:#666670}.card h3{font-size:18px;margin:14px 0 7px}.meta{color:#6c6c75;font-size:12px}.desc{font-size:13px;line-height:1.55;color:#3c3c44;margin-top:11px}.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.chip{border:1px solid #e2e2e8;background:#fafafd;border-radius:7px;padding:4px 8px;font-size:11px;color:#50505a}.footmeta{display:flex;justify-content:space-between;margin-top:14px;padding-top:11px;border-top:1px solid #eeeef2;font-size:12px;color:#6f6f79}.match{color:#17854d;font-weight:700}.note{margin-top:18px;padding:12px 14px;border-left:4px solid #1758c2;background:#edf4ff;color:#3e4654;border-radius:8px;font-size:13px}
+    @media(max-width:900px){.side{width:220px}.top{padding:0 22px}.content{padding:26px 22px}.filters{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <div class="logo"><strong>CS TeamUp</strong><small>CSMJU2030 · Project Collaborator Finder</small></div>
+    <div class="back">← กลับ CSMJU Portal</div>
+    <div class="new">＋ สร้างโปรเจกต์</div>
+    <nav>
+      <a class="on" href="#"><span>▦</span><span>ค้นหาโปรเจกต์</span></a>
+      <a href="#"><span>◫</span><span>Dashboard</span></a>
+      <a href="#"><span>◌</span><span>ข้อความ</span></a>
+      <a href="#"><span>◎</span><span>โปรไฟล์</span></a>
+    </nav>
+    <button class="logout">↪ ออกจากระบบ</button>
+  </aside>
+  <main class="main">
+    <header class="top">
+      <div class="search"><i>⌕</i><input aria-label="ค้นหา" placeholder="ค้นหา..." value=""></div>
+      <div class="user"><span>การแจ้งเตือน　◌</span><span class="avatar">DI</span><strong>นักศึกษา</strong></div>
+    </header>
+    <section class="content">
+      <div class="crumb">CSMJU · CS TeamUp</div>
+      <div class="head"><div><h1>ค้นหาโปรเจกต์</h1><p>หาโปรเจกต์ที่เข้ากับ Skill และหาเพื่อนร่วมทีมที่ใช่</p></div><button class="action">＋ สร้างโปรเจกต์</button></div>
+      <div class="tabs"><button class="tab on">ทั้งหมด</button><button class="tab">แนะนำให้ฉัน</button><button class="tab">ที่ติดตาม</button><button class="tab">ของฉัน</button></div>
+      <div class="filters">
+        <div class="field"><label>ค้นหา</label><input placeholder="ชื่อโปรเจกต์, Skill, ตำแหน่ง..."></div>
+        <div class="field"><label>ประเภท</label><select><option>ทุกประเภท</option><option>งานรายวิชา</option></select></div>
+        <div class="field"><label>รูปแบบ</label><select><option>ทุกรูปแบบ</option><option>ออนไลน์</option></select></div>
+        <div class="field"><label>สถานะ</label><select><option>ทุกสถานะ</option><option>กำลังหาคน</option></select></div>
+      </div>
+      <div class="note">ตัวอย่างหน้าจอจาก UI ที่ปรับตาม CSMJU2030 standard 1.8.4 — ระบบจริงจะโหลดข้อมูลผ่าน NestJS API และ Core Hub SSO</div>
+      <div class="grid">
+        <article class="card"><div class="row"><span class="badge blue">งานรายวิชา</span><span class="badge green">กำลังหาคน</span><span class="badge green">ตรง 82%</span></div><h3>CS TeamUp — Project Collaborator Finder</h3><div class="meta">ผสม (Hybrid) · 1 เทอม · CS 401 · เข้าร่วม 2/4 คน · เจ้าของ ก้อง</div><div class="desc">ระบบหาเพื่อนร่วมทีมทำโปรเจกต์ ทั้งส่วนตัวและของมหาลัย เพื่อสะสมผลงานและทำงานร่วมกันเป็นทีม</div><div class="chips"><span class="chip">Frontend</span><span class="chip">Backend</span><span class="chip">React</span><span class="chip">Node.js</span></div><div class="footmeta"><span>★ 4.8 · 5 รีวิว</span><span class="match">พร้อมรับสมาชิกเพิ่ม</span></div></article>
+        <article class="card"><div class="row"><span class="badge blue">โปรเจกต์จบ</span><span class="badge green">กำลังหาคน</span><span class="badge green">ตรง 74%</span></div><h3>ระบบแนะนำงานฝึกสหกิจ</h3><div class="meta">ออนไลน์ · 2 เทอม · เข้าร่วม 2/3 คน · เจ้าของ นุ่น</div><div class="desc">ระบบแนะนำสถานประกอบการสหกิจตามทักษะนักศึกษา ต้องการ Data และ Frontend เพิ่มอีก 1 คน</div><div class="chips"><span class="chip">Data</span><span class="chip">Frontend</span><span class="chip">Python</span><span class="chip">React</span></div><div class="footmeta"><span>ยังไม่มีรีวิว</span><span class="match">เปิดรับ 1 ตำแหน่ง</span></div></article>
+        <article class="card"><div class="row"><span class="badge blue">ส่วนตัว / แข่งขัน</span><span class="badge green">กำลังหาคน</span></div><h3>แอปติดตามงบส่วนตัว</h3><div class="meta">ออนไลน์ · เข้าร่วม 1/2 คน · เจ้าของ ฉัน</div><div class="desc">โปรเจกต์ portfolio สำหรับทำแอปติดตามรายรับรายจ่าย อยากได้เพื่อนช่วย UI/UX และ mobile</div><div class="chips"><span class="chip">UI Designer</span><span class="chip">Mobile Dev</span><span class="chip">Flutter</span></div><div class="footmeta"><span>แก้ไขได้เฉพาะเจ้าของ</span><span class="match">กำลังรับ 1 คน</span></div></article>
+        <article class="card"><div class="row"><span class="badge blue">งานรายวิชา</span><span class="badge gray">เสร็จสมบูรณ์</span></div><h3>เว็บไซต์จองห้องประชุมสาขา</h3><div class="meta">ออนไซต์ · 1 เทอม · CS 210 · เข้าร่วม 2/2 คน</div><div class="desc">โปรเจกต์ที่เสร็จแล้ว ใช้เป็น portfolio และเป็นตัวอย่างสำหรับระบบรีวิวความน่าเชื่อถือหลังจบงาน</div><div class="chips"><span class="chip">Backend</span><span class="chip">Node.js</span></div><div class="footmeta"><span>★ รีวิวหลังจบโปรเจกต์</span><span>ปิดรับสมาชิก</span></div></article>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>
