@@ -1,0 +1,53 @@
+{
+  "name": "backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nest build",
+    "start": "node dist/main.js",
+    "start:dev": "nest start --watch",
+    "lint": "eslint \"src/**/*.ts\"",
+    "typecheck": "pnpm run prisma:generate && tsc --noEmit",
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "generate:openapi": "pnpm run openapi:generate",
+    "openapi:generate": "pnpm run prisma:generate && nest build && node dist/openapi.js",
+    "build:seed": "rm -rf dist-seed && tsc -p tsconfig.seed.json && node dist-seed/prisma/seed.js"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/config": "^4.0.4",
+    "@nestjs/core": "^11.1.6",
+    "@nestjs/platform-express": "^11.1.6",
+    "@nestjs/swagger": "^11.2.6",
+    "@prisma/adapter-pg": "7.9.1",
+    "@prisma/client": "7.9.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "dotenv": "^17.2.2",
+    "jose": "^5.10.0",
+    "pg": "^8.23.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.10",
+    "@nestjs/schematics": "^11.0.7",
+    "@nestjs/testing": "^11.1.6",
+    "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22",
+    "@types/pg": "^8.15.5",
+    "@types/supertest": "^6.0.3",
+    "eslint": "^9",
+    "jest": "^30.0.4",
+    "prisma": "7.9.1",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.5",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.1"
+  }
+}
