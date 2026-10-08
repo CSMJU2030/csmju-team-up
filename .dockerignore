@@ -1,0 +1,9 @@
+**/.env*
+**/node_modules
+**/.pnpm-store
+**/.next
+**/dist
+**/coverage
+.git
+.github
+standards
