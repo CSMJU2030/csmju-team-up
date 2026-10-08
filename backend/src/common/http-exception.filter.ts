@@ -17,7 +17,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = host.switchToHttp().getResponse<Response>();
     const request = host.switchToHttp().getRequest<Request>();
     const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
-    const code = statusToCode[status] ?? "INTERNAL_ERROR";
+    let code = statusToCode[status] ?? "INTERNAL_ERROR";
     let message = "เกิดข้อผิดพลาดจากระบบ";
     let details: unknown = undefined;
 

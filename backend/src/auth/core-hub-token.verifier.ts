@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable, ServiceUnavailableException, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { decodeProtectedHeader, JOSEError, jwtVerify } from "jose";
+import { decodeProtectedHeader, errors, jwtVerify } from "jose";
 import { JwksService } from "./jwks.service.js";
 import { CORE_ROLE_TO_SUBSYSTEM_ROLE } from "./role-mapping.js";
 import type { CoreIdentity } from "./decorators/current-user.js";
@@ -32,7 +32,7 @@ export class CoreHubTokenVerifier {
         requiredClaims: ["sub", "role", "iat", "exp"],
       }));
     } catch (error) {
-      if (error instanceof JOSEError) throw new UnauthorizedException("Invalid access token");
+      if (error instanceof errors.JOSEError) throw new UnauthorizedException("Invalid access token");
       throw new ServiceUnavailableException("Core Hub authentication service unavailable");
     }
 

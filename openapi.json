@@ -1,175 +1,200 @@
 {
-  "openapi": "3.1.0",
-  "info": {
-    "title": "CS TeamUp API",
-    "version": "1.0.0",
-    "description": "CS TeamUp subsystem API. Authentication is provided by CSMJU2030 Core Hub SSO."
-  },
-  "servers": [
-    {
-      "url": "http://localhost:3220"
-    }
-  ],
+  "openapi": "3.0.0",
   "paths": {
-    "/api/health": {
-      "get": {
-        "tags": [
-          "Health"
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/Success"
-          },
-          "503": {
-            "$ref": "#/components/responses/ServiceUnavailable"
-          }
-        }
-      }
-    },
     "/auth/login": {
       "get": {
-        "tags": [
-          "Auth"
-        ],
-        "parameters": [
-          {
-            "name": "next",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "maxLength": 512
-            }
-          }
-        ],
+        "operationId": "SsoCallbackController_login",
+        "parameters": [],
         "responses": {
-          "302": {
-            "description": "Redirect to Core Hub SSO"
+          "200": {
+            "description": ""
           }
-        }
+        },
+        "tags": [
+          "SsoCallback"
+        ]
       }
     },
     "/auth/callback": {
       "get": {
-        "tags": [
-          "Auth"
-        ],
-        "parameters": [
-          {
-            "name": "state",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "access_token",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "operationId": "SsoCallbackController_callback",
+        "parameters": [],
         "responses": {
-          "302": {
-            "description": "Create subsystem session and redirect"
-          },
-          "400": {
-            "$ref": "#/components/responses/Error"
-          },
-          "401": {
-            "$ref": "#/components/responses/Error"
+          "200": {
+            "description": ""
           }
-        }
+        },
+        "tags": [
+          "SsoCallback"
+        ]
       }
     },
     "/auth/logout": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "operationId": "SsoCallbackController_logout",
+        "parameters": [],
         "responses": {
-          "303": {
-            "description": "Redirect to Core Hub logout"
+          "201": {
+            "description": ""
           }
-        }
+        },
+        "tags": [
+          "SsoCallback"
+        ]
       }
     },
-    "/api/v1/me": {
+    "/health": {
       "get": {
-        "tags": [
-          "Me"
-        ],
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
+        "operationId": "HealthController_get",
+        "parameters": [],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/Success"
-          },
-          "401": {
-            "$ref": "#/components/responses/Error"
+            "description": ""
           }
-        }
+        },
+        "tags": [
+          "Health"
+        ]
       }
     },
-    "/api/v1/projects": {
+    "/v1/me": {
       "get": {
-        "tags": [
-          "Projects"
-        ],
+        "operationId": "MeController_getMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
         "security": [
           {
-            "cookieAuth": []
+            "cookie": []
           }
         ],
+        "tags": [
+          "Me"
+        ]
+      }
+    },
+    "/v1/projects": {
+      "get": {
+        "operationId": "ProjectsController_list",
         "parameters": [
           {
-            "$ref": "#/components/parameters/Page"
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
           },
           {
-            "$ref": "#/components/parameters/Limit"
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
           },
           {
             "name": "q",
+            "required": false,
             "in": "query",
             "schema": {
-              "type": "string",
-              "maxLength": 120
+              "maxLength": 120,
+              "type": "string"
             }
           },
           {
             "name": "kind",
+            "required": false,
             "in": "query",
             "schema": {
-              "$ref": "#/components/schemas/ProjectKind"
+              "type": "string",
+              "enum": [
+                "COURSE",
+                "SENIOR_PROJECT",
+                "PERSONAL_COMPETITION"
+              ]
+            }
+          },
+          {
+            "name": "origin",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "TEACHER_ASSIGNED",
+                "SELF_CREATED",
+                "UNSPECIFIED"
+              ]
+            }
+          },
+          {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PERSONAL",
+                "DEPARTMENT",
+                "UNSPECIFIED"
+              ]
             }
           },
           {
             "name": "status",
+            "required": false,
             "in": "query",
             "schema": {
-              "$ref": "#/components/schemas/ProjectStatus"
+              "type": "string",
+              "enum": [
+                "RECRUITING",
+                "IN_PROGRESS",
+                "COMPLETED"
+              ]
             }
           },
           {
             "name": "format",
+            "required": false,
             "in": "query",
             "schema": {
-              "$ref": "#/components/schemas/ProjectFormat"
+              "type": "string",
+              "enum": [
+                "ONLINE",
+                "ONSITE",
+                "HYBRID"
+              ]
             }
           },
           {
             "name": "skill",
+            "required": false,
             "in": "query",
             "schema": {
-              "type": "string",
-              "maxLength": 80
+              "maxLength": 80,
+              "type": "string"
             }
           },
           {
             "name": "mine",
+            "required": false,
             "in": "query",
             "schema": {
               "type": "string",
@@ -182,846 +207,833 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/SuccessList"
-          },
-          "401": {
-            "$ref": "#/components/responses/Error"
+            "description": ""
           }
-        }
-      },
-      "post": {
-        "tags": [
-          "Projects"
-        ],
+        },
         "security": [
           {
-            "cookieAuth": []
+            "cookie": []
           }
         ],
+        "tags": [
+          "Projects"
+        ]
+      },
+      "post": {
+        "operationId": "ProjectsController_create",
+        "parameters": [],
         "requestBody": {
-          "$ref": "#/components/requestBodies/Project"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProjectDto"
+              }
+            }
+          }
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/Success"
-          },
-          "400": {
-            "$ref": "#/components/responses/Error"
-          },
-          "403": {
-            "$ref": "#/components/responses/Error"
+            "description": ""
           }
-        }
-      }
-    },
-    "/api/v1/projects/{id}": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/ProjectId"
-        }
-      ],
-      "get": {
-        "tags": [
-          "Projects"
-        ],
+        },
         "security": [
           {
-            "cookieAuth": []
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/v1/projects/{id}": {
+      "get": {
+        "operationId": "ProjectsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/Success"
-          },
-          "404": {
-            "$ref": "#/components/responses/Error"
+            "description": ""
           }
-        }
-      },
-      "patch": {
-        "tags": [
-          "Projects"
-        ],
+        },
         "security": [
           {
-            "cookieAuth": []
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Projects"
+        ]
+      },
+      "patch": {
+        "operationId": "ProjectsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/Project"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProjectDto"
+              }
+            }
+          }
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/Success"
-          },
-          "403": {
-            "$ref": "#/components/responses/Error"
-          },
-          "404": {
-            "$ref": "#/components/responses/Error"
+            "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Projects"
+        ]
       },
       "delete": {
-        "tags": [
-          "Projects"
-        ],
-        "security": [
+        "operationId": "ProjectsController_remove",
+        "parameters": [
           {
-            "cookieAuth": []
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/Success"
-          },
-          "403": {
-            "$ref": "#/components/responses/Error"
-          },
-          "404": {
-            "$ref": "#/components/responses/Error"
+            "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Projects"
+        ]
       }
     },
-    "/api/v1/projects/{id}/status": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/ProjectId"
-        }
-      ],
+    "/v1/projects/{id}/status": {
       "patch": {
-        "tags": [
-          "Projects"
-        ],
-        "security": [
+        "operationId": "ProjectsController_status",
+        "parameters": [
           {
-            "cookieAuth": []
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": [
-                  "status"
-                ],
-                "properties": {
-                  "status": {
-                    "$ref": "#/components/schemas/ProjectStatus"
-                  }
-                }
+                "$ref": "#/components/schemas/StatusDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/Success"
-          },
-          "403": {
-            "$ref": "#/components/responses/Error"
+            "description": ""
           }
-        }
-      }
-    },
-    "/api/v1/projects/{id}/applications": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/ProjectId"
-        }
-      ],
-      "post": {
-        "tags": [
-          "Projects"
-        ],
+        },
         "security": [
           {
-            "cookieAuth": []
+            "cookie": []
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ApplicationInput"
-              }
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/v1/projects/{id}/applications": {
+      "post": {
+        "operationId": "ProjectsController_apply",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
             }
           }
-        },
-        "responses": {
-          "201": {
-            "$ref": "#/components/responses/Success"
-          },
-          "409": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
-    "/api/v1/projects/{id}/applications/{applicationId}/accept": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/ProjectId"
-        },
-        {
-          "$ref": "#/components/parameters/ApplicationId"
-        }
-      ],
-      "post": {
-        "tags": [
-          "Projects"
-        ],
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/Success"
-          },
-          "403": {
-            "$ref": "#/components/responses/Error"
-          },
-          "409": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
-    "/api/v1/projects/{id}/applications/{applicationId}/reject": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/ProjectId"
-        },
-        {
-          "$ref": "#/components/parameters/ApplicationId"
-        }
-      ],
-      "post": {
-        "tags": [
-          "Projects"
-        ],
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/Success"
-          },
-          "403": {
-            "$ref": "#/components/responses/Error"
-          },
-          "404": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
-    "/api/v1/projects/{id}/invitations": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/ProjectId"
-        }
-      ],
-      "post": {
-        "tags": [
-          "Projects"
-        ],
-        "security": [
-          {
-            "cookieAuth": []
-          }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/InvitationInput"
+                "$ref": "#/components/schemas/ApplyProjectDto"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/Success"
-          },
-          "403": {
-            "$ref": "#/components/responses/Error"
-          },
-          "409": {
-            "$ref": "#/components/responses/Error"
+            "description": ""
           }
-        }
-      }
-    },
-    "/api/v1/projects/{id}/invitations/{invitationId}/accept": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/ProjectId"
         },
-        {
-          "$ref": "#/components/parameters/InvitationId"
-        }
-      ],
-      "post": {
-        "tags": [
-          "Projects"
-        ],
         "security": [
           {
-            "cookieAuth": []
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/v1/projects/{id}/applications/{applicationId}/accept": {
+      "post": {
+        "operationId": "ProjectsController_acceptApplication",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "applicationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
-          "200": {
-            "$ref": "#/components/responses/Success"
-          },
-          "404": {
-            "$ref": "#/components/responses/Error"
-          },
-          "409": {
-            "$ref": "#/components/responses/Error"
+          "201": {
+            "description": ""
           }
-        }
-      }
-    },
-    "/api/v1/projects/{id}/invitations/{invitationId}/decline": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/ProjectId"
         },
-        {
-          "$ref": "#/components/parameters/InvitationId"
-        }
-      ],
-      "post": {
-        "tags": [
-          "Projects"
-        ],
         "security": [
           {
-            "cookieAuth": []
+            "cookie": []
           }
         ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/Success"
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/v1/projects/{id}/applications/{applicationId}/reject": {
+      "post": {
+        "operationId": "ProjectsController_rejectApplication",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           },
-          "404": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
-    "/api/v1/projects/{id}/follow": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/ProjectId"
-        }
-      ],
-      "post": {
-        "tags": [
-          "Projects"
-        ],
-        "security": [
           {
-            "cookieAuth": []
+            "name": "applicationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
-          "200": {
-            "$ref": "#/components/responses/Success"
+          "201": {
+            "description": ""
           }
-        }
-      }
-    },
-    "/api/v1/projects/{id}/questions": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/ProjectId"
-        }
-      ],
-      "post": {
-        "tags": [
-          "Projects"
-        ],
+        },
         "security": [
           {
-            "cookieAuth": []
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/v1/projects/{id}/invitations": {
+      "post": {
+        "operationId": "ProjectsController_invite",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": [
-                  "question"
-                ],
-                "properties": {
-                  "question": {
-                    "type": "string",
-                    "maxLength": 1000
-                  }
-                }
+                "$ref": "#/components/schemas/InviteProjectDto"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/Success"
+            "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Projects"
+        ]
       }
     },
-    "/api/v1/projects/{id}/questions/{questionId}": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/ProjectId"
+    "/v1/projects/{id}/invitations/{invitationId}/accept": {
+      "post": {
+        "operationId": "ProjectsController_acceptInvitation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "invitationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
         },
-        {
-          "$ref": "#/components/parameters/QuestionId"
-        }
-      ],
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/v1/projects/{id}/invitations/{invitationId}/decline": {
+      "post": {
+        "operationId": "ProjectsController_declineInvitation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "invitationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/v1/projects/{id}/follow": {
+      "post": {
+        "operationId": "ProjectsController_follow",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/v1/projects/{id}/questions": {
+      "post": {
+        "operationId": "ProjectsController_ask",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AskQuestionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/v1/projects/{id}/questions/{questionId}": {
       "patch": {
-        "tags": [
-          "Projects"
-        ],
-        "security": [
+        "operationId": "ProjectsController_answer",
+        "parameters": [
           {
-            "cookieAuth": []
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "questionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": [
-                  "answer"
-                ],
-                "properties": {
-                  "answer": {
-                    "type": "string",
-                    "maxLength": 2000
-                  }
-                }
+                "$ref": "#/components/schemas/AnswerQuestionDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/Success"
-          },
-          "403": {
-            "$ref": "#/components/responses/Error"
+            "description": ""
           }
-        }
-      }
-    },
-    "/api/v1/projects/{id}/reviews": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/ProjectId"
-        }
-      ],
-      "post": {
-        "tags": [
-          "Projects"
-        ],
+        },
         "security": [
           {
-            "cookieAuth": []
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/v1/projects/{id}/reviews": {
+      "post": {
+        "operationId": "ProjectsController_review",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReviewInput"
+                "$ref": "#/components/schemas/ReviewDto"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/Success"
-          },
-          "409": {
-            "$ref": "#/components/responses/Error"
+            "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Projects"
+        ]
       }
     },
-    "/api/v1/profile": {
+    "/v1/profile": {
       "get": {
+        "operationId": "ProfileController_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
         "tags": [
           "Profile"
-        ],
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/Success"
-          }
-        }
+        ]
       },
       "patch": {
-        "tags": [
-          "Profile"
-        ],
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
+        "operationId": "ProfileController_update",
+        "parameters": [],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ProfileInput"
+                "$ref": "#/components/schemas/UpdateProfileDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/Success"
-          },
-          "400": {
-            "$ref": "#/components/responses/Error"
+            "description": ""
           }
-        }
-      }
-    },
-    "/api/v1/profile/portfolio": {
-      "post": {
-        "tags": [
-          "Profile"
-        ],
+        },
         "security": [
           {
-            "cookieAuth": []
+            "cookie": []
           }
         ],
+        "tags": [
+          "Profile"
+        ]
+      }
+    },
+    "/v1/profile/portfolio": {
+      "post": {
+        "operationId": "ProfileController_addPortfolio",
+        "parameters": [],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PortfolioInput"
+                "$ref": "#/components/schemas/AddPortfolioDto"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/Success"
+            "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Profile"
+        ]
       }
     },
-    "/api/v1/profile/portfolio/{id}": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/UUID"
-        }
-      ],
+    "/v1/profile/portfolio/{id}": {
       "delete": {
+        "operationId": "ProfileController_deletePortfolio",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
         "tags": [
           "Profile"
-        ],
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/Success"
-          },
-          "404": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
+        ]
       }
     },
-    "/api/v1/conversations": {
+    "/v1/conversations": {
       "get": {
-        "tags": [
-          "Messages"
-        ],
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
+        "operationId": "MessagesController_list",
+        "parameters": [],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/Success"
+            "description": ""
           }
-        }
-      },
-      "post": {
-        "tags": [
-          "Messages"
-        ],
+        },
         "security": [
           {
-            "cookieAuth": []
+            "cookie": []
           }
         ],
+        "tags": [
+          "Conversations"
+        ]
+      },
+      "post": {
+        "operationId": "MessagesController_create",
+        "parameters": [],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ConversationInput"
+                "$ref": "#/components/schemas/CreateConversationDto"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/Success"
+            "description": ""
           }
-        }
-      }
-    },
-    "/api/v1/conversations/{id}/messages": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/ConversationId"
-        }
-      ],
-      "get": {
-        "tags": [
-          "Messages"
-        ],
+        },
         "security": [
           {
-            "cookieAuth": []
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Conversations"
+        ]
+      }
+    },
+    "/v1/conversations/{id}/messages": {
+      "get": {
+        "operationId": "MessagesController_messages",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/Success"
-          },
-          "403": {
-            "$ref": "#/components/responses/Error"
+            "description": ""
           }
-        }
-      },
-      "post": {
-        "tags": [
-          "Messages"
-        ],
+        },
         "security": [
           {
-            "cookieAuth": []
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Conversations"
+        ]
+      },
+      "post": {
+        "operationId": "MessagesController_send",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/MessageInput"
+                "$ref": "#/components/schemas/MessageDto"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/Success"
-          },
-          "403": {
-            "$ref": "#/components/responses/Error"
+            "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Conversations"
+        ]
       }
     },
-    "/api/v1/notifications": {
+    "/v1/notifications": {
       "get": {
+        "operationId": "NotificationsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
         "tags": [
           "Notifications"
-        ],
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/Success"
-          }
-        }
+        ]
       }
     },
-    "/api/v1/notifications/{id}/read": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/UUID"
-        }
-      ],
+    "/v1/notifications/{id}/read": {
       "patch": {
-        "tags": [
-          "Notifications"
-        ],
-        "security": [
+        "operationId": "NotificationsController_read",
+        "parameters": [
           {
-            "cookieAuth": []
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/Success"
-          },
-          "404": {
-            "$ref": "#/components/responses/Error"
+            "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Notifications"
+        ]
       }
     }
   },
+  "info": {
+    "title": "CS TeamUp API",
+    "description": "CSMJU2030 Project Collaborator Finder API",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
   "components": {
     "securitySchemes": {
-      "cookieAuth": {
+      "cookie": {
         "type": "apiKey",
         "in": "cookie",
         "name": "csmju_teamup_access_token"
-      }
-    },
-    "parameters": {
-      "Page": {
-        "name": "page",
-        "in": "query",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 1
-        }
       },
-      "Limit": {
-        "name": "limit",
-        "in": "query",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 100,
-          "default": 20
-        }
-      },
-      "ProjectId": {
-        "name": "id",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid"
-        }
-      },
-      "ApplicationId": {
-        "name": "applicationId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid"
-        }
-      },
-      "InvitationId": {
-        "name": "invitationId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid"
-        }
-      },
-      "QuestionId": {
-        "name": "questionId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid"
-        }
-      },
-      "ConversationId": {
-        "name": "id",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid"
-        }
-      },
-      "UUID": {
-        "name": "id",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid"
-        }
-      }
-    },
-    "requestBodies": {
-      "Project": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ProjectInput"
-            }
-          }
-        }
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
       }
     },
     "schemas": {
-      "ProjectKind": {
-        "type": "string",
-        "enum": [
-          "COURSE",
-          "SENIOR_PROJECT",
-          "PERSONAL_COMPETITION"
-        ]
-      },
-      "ProjectFormat": {
-        "type": "string",
-        "enum": [
-          "ONLINE",
-          "ONSITE",
-          "HYBRID"
-        ]
-      },
-      "ProjectStatus": {
-        "type": "string",
-        "enum": [
-          "RECRUITING",
-          "IN_PROGRESS",
-          "COMPLETED"
-        ]
-      },
-      "ProjectInput": {
+      "Object": {
         "type": "object",
-        "required": [
-          "title",
-          "kind",
-          "size",
-          "format",
-          "description",
-          "roles",
-          "skills"
-        ],
+        "properties": {}
+      },
+      "CreateProjectDto": {
+        "type": "object",
         "properties": {
           "title": {
             "type": "string",
@@ -1029,14 +1041,52 @@
             "maxLength": 160
           },
           "kind": {
-            "$ref": "#/components/schemas/ProjectKind"
+            "type": "string",
+            "enum": [
+              "COURSE",
+              "SENIOR_PROJECT",
+              "PERSONAL_COMPETITION"
+            ]
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "TEACHER_ASSIGNED",
+              "SELF_CREATED",
+              "UNSPECIFIED"
+            ],
+            "default": "SELF_CREATED"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "PERSONAL",
+              "DEPARTMENT",
+              "UNSPECIFIED"
+            ],
+            "default": "PERSONAL"
+          },
+          "compensationType": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "REWARD",
+              "WAGE"
+            ],
+            "default": "NONE"
+          },
+          "compensationAmount": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100000000,
+            "description": "Total project budget in THB"
           },
           "courseCode": {
             "type": "string",
             "maxLength": 50
           },
           "size": {
-            "type": "integer",
+            "type": "number",
             "minimum": 1,
             "maximum": 100
           },
@@ -1045,7 +1095,12 @@
             "maxLength": 120
           },
           "format": {
-            "$ref": "#/components/schemas/ProjectFormat"
+            "type": "string",
+            "enum": [
+              "ONLINE",
+              "ONSITE",
+              "HYBRID"
+            ]
           },
           "description": {
             "type": "string",
@@ -1068,9 +1123,22 @@
             "type": "string",
             "maxLength": 500
           }
-        }
+        },
+        "required": [
+          "title",
+          "kind",
+          "size",
+          "format",
+          "description",
+          "roles",
+          "skills"
+        ]
       },
-      "ApplicationInput": {
+      "StatusDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "ApplyProjectDto": {
         "type": "object",
         "properties": {
           "role": {
@@ -1083,28 +1151,74 @@
           }
         }
       },
-      "InvitationInput": {
+      "InviteProjectDto": {
         "type": "object",
-        "required": [
-          "inviteeCoreUserId"
-        ],
         "properties": {
           "inviteeCoreUserId": {
             "type": "string",
+            "minLength": 1,
             "maxLength": 64
           },
           "role": {
             "type": "string",
             "maxLength": 120
           }
-        }
-      },
-      "ProfileInput": {
-        "type": "object",
+        },
         "required": [
-          "skills",
-          "isAvailable"
-        ],
+          "inviteeCoreUserId"
+        ]
+      },
+      "AskQuestionDto": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "question"
+        ]
+      },
+      "AnswerQuestionDto": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "answer"
+        ]
+      },
+      "ReviewDto": {
+        "type": "object",
+        "properties": {
+          "toCoreUserId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "stars": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "toCoreUserId",
+          "stars"
+        ]
+      },
+      "UpdateProfileDto": {
+        "type": "object",
         "properties": {
           "skills": {
             "type": "array",
@@ -1114,11 +1228,13 @@
           },
           "githubUrl": {
             "type": "string",
-            "format": "uri"
+            "format": "uri",
+            "maxLength": 500
           },
           "linkedinUrl": {
             "type": "string",
-            "format": "uri"
+            "format": "uri",
+            "maxLength": 500
           },
           "contactText": {
             "type": "string",
@@ -1127,13 +1243,14 @@
           "isAvailable": {
             "type": "boolean"
           }
-        }
-      },
-      "PortfolioInput": {
-        "type": "object",
+        },
         "required": [
-          "imageId"
-        ],
+          "skills",
+          "isAvailable"
+        ]
+      },
+      "AddPortfolioDto": {
+        "type": "object",
         "properties": {
           "imageId": {
             "type": "string",
@@ -1143,783 +1260,36 @@
             "type": "string",
             "maxLength": 200
           }
-        }
-      },
-      "ConversationInput": {
-        "type": "object",
+        },
         "required": [
-          "otherCoreUserId"
-        ],
+          "imageId"
+        ]
+      },
+      "CreateConversationDto": {
+        "type": "object",
         "properties": {
           "otherCoreUserId": {
             "type": "string",
+            "minLength": 1,
             "maxLength": 64
           }
-        }
-      },
-      "MessageInput": {
-        "type": "object",
+        },
         "required": [
-          "body"
-        ],
+          "otherCoreUserId"
+        ]
+      },
+      "MessageDto": {
+        "type": "object",
         "properties": {
           "body": {
             "type": "string",
             "minLength": 1,
             "maxLength": 2000
           }
-        }
-      },
-      "ReviewInput": {
-        "type": "object",
-        "required": [
-          "toCoreUserId",
-          "stars"
-        ],
-        "properties": {
-          "toCoreUserId": {
-            "type": "string",
-            "maxLength": 64
-          },
-          "stars": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 5
-          },
-          "comment": {
-            "type": "string",
-            "maxLength": 500
-          }
-        }
-      },
-      "Error": {
-        "type": "object",
-        "required": [
-          "success",
-          "error"
-        ],
-        "properties": {
-          "success": {
-            "const": false
-          },
-          "error": {
-            "type": "object",
-            "required": [
-              "code",
-              "message"
-            ],
-            "properties": {
-              "code": {
-                "type": "string"
-              },
-              "message": {
-                "type": "string"
-              },
-              "details": {}
-            }
-          }
-        }
-      },
-      "ApplicationStatus": {
-        "type": "string",
-        "enum": [
-          "PENDING",
-          "ACCEPTED",
-          "REJECTED"
-        ]
-      },
-      "InvitationStatus": {
-        "type": "string",
-        "enum": [
-          "PENDING",
-          "ACCEPTED",
-          "DECLINED"
-        ]
-      },
-      "ProjectOwner": {
-        "type": "object",
-        "required": [
-          "coreUserId",
-          "isCurrentUser",
-          "rating"
-        ],
-        "properties": {
-          "coreUserId": {
-            "type": "string"
-          },
-          "isCurrentUser": {
-            "type": "boolean"
-          },
-          "rating": {
-            "type": "number",
-            "nullable": true
-          }
-        }
-      },
-      "ProjectMember": {
-        "type": "object",
-        "required": [
-          "id",
-          "coreUserId",
-          "isCurrentUser",
-          "role",
-          "message",
-          "joinedAt"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "coreUserId": {
-            "type": "string"
-          },
-          "isCurrentUser": {
-            "type": "boolean"
-          },
-          "role": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string",
-            "nullable": true
-          },
-          "joinedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "ProjectApplication": {
-        "type": "object",
-        "required": [
-          "id",
-          "coreUserId",
-          "isCurrentUser",
-          "role",
-          "message",
-          "status",
-          "createdAt"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "coreUserId": {
-            "type": "string"
-          },
-          "isCurrentUser": {
-            "type": "boolean"
-          },
-          "role": {
-            "type": "string",
-            "nullable": true
-          },
-          "message": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "$ref": "#/components/schemas/ApplicationStatus"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "ProjectInvitation": {
-        "type": "object",
-        "required": [
-          "id",
-          "inviteeCoreUserId",
-          "isCurrentUser",
-          "role",
-          "status",
-          "createdAt"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "inviteeCoreUserId": {
-            "type": "string"
-          },
-          "isCurrentUser": {
-            "type": "boolean"
-          },
-          "role": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "$ref": "#/components/schemas/InvitationStatus"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "ProjectQuestion": {
-        "type": "object",
-        "required": [
-          "id",
-          "askerCoreUserId",
-          "isCurrentUser",
-          "question",
-          "answer",
-          "answeredAt",
-          "createdAt"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "askerCoreUserId": {
-            "type": "string"
-          },
-          "isCurrentUser": {
-            "type": "boolean"
-          },
-          "question": {
-            "type": "string"
-          },
-          "answer": {
-            "type": "string",
-            "nullable": true
-          },
-          "answeredAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "ProjectReview": {
-        "type": "object",
-        "required": [
-          "id",
-          "fromCoreUserId",
-          "toCoreUserId",
-          "stars",
-          "comment",
-          "createdAt"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "fromCoreUserId": {
-            "type": "string"
-          },
-          "toCoreUserId": {
-            "type": "string"
-          },
-          "stars": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 5
-          },
-          "comment": {
-            "type": "string",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "Project": {
-        "type": "object",
-        "required": [
-          "id",
-          "title",
-          "kind",
-          "courseCode",
-          "size",
-          "duration",
-          "format",
-          "description",
-          "status",
-          "contactText",
-          "createdAt",
-          "updatedAt",
-          "owner",
-          "roles",
-          "skills",
-          "members",
-          "applications",
-          "invitations",
-          "questions",
-          "reviews",
-          "isFollowing",
-          "acceptedCount",
-          "remainingSlots",
-          "currentApplication",
-          "currentInvitation"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "title": {
-            "type": "string"
-          },
-          "kind": {
-            "$ref": "#/components/schemas/ProjectKind"
-          },
-          "courseCode": {
-            "type": "string",
-            "nullable": true
-          },
-          "size": {
-            "type": "integer"
-          },
-          "duration": {
-            "type": "string",
-            "nullable": true
-          },
-          "format": {
-            "$ref": "#/components/schemas/ProjectFormat"
-          },
-          "description": {
-            "type": "string"
-          },
-          "status": {
-            "$ref": "#/components/schemas/ProjectStatus"
-          },
-          "contactText": {
-            "type": "string",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "owner": {
-            "$ref": "#/components/schemas/ProjectOwner"
-          },
-          "roles": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "skills": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "members": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProjectMember"
-            }
-          },
-          "applications": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProjectApplication"
-            }
-          },
-          "invitations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProjectInvitation"
-            }
-          },
-          "questions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProjectQuestion"
-            }
-          },
-          "reviews": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProjectReview"
-            }
-          },
-          "isFollowing": {
-            "type": "boolean"
-          },
-          "acceptedCount": {
-            "type": "integer"
-          },
-          "remainingSlots": {
-            "type": "integer"
-          },
-          "currentApplication": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "format": "uuid"
-                  },
-                  "status": {
-                    "$ref": "#/components/schemas/ApplicationStatus"
-                  }
-                },
-                "required": [
-                  "id",
-                  "status"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "currentInvitation": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "format": "uuid"
-                  },
-                  "role": {
-                    "type": "string",
-                    "nullable": true
-                  },
-                  "status": {
-                    "$ref": "#/components/schemas/InvitationStatus"
-                  }
-                },
-                "required": [
-                  "id",
-                  "role",
-                  "status"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        }
-      },
-      "Me": {
-        "type": "object",
-        "required": [
-          "coreUserId",
-          "coreRole",
-          "subsystemRole",
-          "session"
-        ],
-        "properties": {
-          "coreUserId": {
-            "type": "string"
-          },
-          "coreRole": {
-            "type": "string"
-          },
-          "subsystemRole": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          },
-          "session": {
-            "type": "object",
-            "required": [
-              "expiresAt"
-            ],
-            "properties": {
-              "expiresAt": {
-                "type": "string",
-                "format": "date-time"
-              }
-            }
-          }
-        }
-      },
-      "PortfolioItem": {
-        "type": "object",
-        "required": [
-          "id",
-          "imageId",
-          "caption"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "imageId": {
-            "type": "string"
-          },
-          "caption": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "Profile": {
-        "type": "object",
-        "required": [
-          "id",
-          "coreUserId",
-          "skills",
-          "githubUrl",
-          "linkedinUrl",
-          "contactText",
-          "isAvailable",
-          "portfolio"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "coreUserId": {
-            "type": "string"
-          },
-          "skills": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "githubUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "linkedinUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "contactText": {
-            "type": "string",
-            "nullable": true
-          },
-          "isAvailable": {
-            "type": "boolean"
-          },
-          "portfolio": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PortfolioItem"
-            }
-          }
-        }
-      },
-      "Notification": {
-        "type": "object",
-        "required": [
-          "id",
-          "type",
-          "message",
-          "isRead",
-          "createdAt"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "type": {
-            "type": "string"
-          },
-          "projectId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "actorCoreUserId": {
-            "type": "string",
-            "nullable": true
-          },
-          "message": {
-            "type": "string"
-          },
-          "isRead": {
-            "type": "boolean"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "ConversationParticipant": {
-        "type": "object",
-        "required": [
-          "coreUserId"
-        ],
-        "properties": {
-          "coreUserId": {
-            "type": "string"
-          }
-        }
-      },
-      "Message": {
-        "type": "object",
-        "required": [
-          "id",
-          "conversationId",
-          "senderCoreUserId",
-          "body",
-          "createdAt"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "conversationId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "senderCoreUserId": {
-            "type": "string"
-          },
-          "body": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "Conversation": {
-        "type": "object",
-        "required": [
-          "id",
-          "participants",
-          "messages"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "participants": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ConversationParticipant"
-            }
-          },
-          "messages": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Message"
-            }
-          }
-        }
-      }
-    },
-    "responses": {
-      "Success": {
-        "description": "Success response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "required": [
-                "success",
-                "data"
-              ],
-              "properties": {
-                "success": {
-                  "const": true
-                },
-                "data": {}
-              }
-            }
-          }
-        }
-      },
-      "SuccessList": {
-        "description": "Paginated success response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "required": [
-                "success",
-                "data",
-                "meta"
-              ],
-              "properties": {
-                "success": {
-                  "const": true
-                },
-                "data": {
-                  "type": "array",
-                  "items": {}
-                },
-                "meta": {
-                  "type": "object",
-                  "properties": {
-                    "total": {
-                      "type": "integer"
-                    },
-                    "page": {
-                      "type": "integer"
-                    },
-                    "limit": {
-                      "type": "integer"
-                    },
-                    "totalPages": {
-                      "type": "integer"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "Error": {
-        "description": "Error response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            }
-          }
-        }
-      },
-      "ServiceUnavailable": {
-        "description": "Dependency unavailable",
-        "headers": {
-          "Retry-After": {
-            "schema": {
-              "type": "integer"
-            }
-          }
         },
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            }
-          }
-        }
+        "required": [
+          "body"
+        ]
       }
     }
   }

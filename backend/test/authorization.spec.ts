@@ -1,4 +1,5 @@
 import { ForbiddenException } from "@nestjs/common";
+import { jest } from "@jest/globals";
 import { ProjectsService } from "../src/projects/projects.service.js";
 import type { CoreIdentity } from "../src/auth/decorators/current-user.js";
 

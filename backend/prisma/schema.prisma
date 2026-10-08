@@ -26,6 +26,24 @@ enum ProjectStatus {
   COMPLETED
 }
 
+enum ProjectOrigin {
+  TEACHER_ASSIGNED
+  SELF_CREATED
+  UNSPECIFIED
+}
+
+enum ProjectScope {
+  PERSONAL
+  DEPARTMENT
+  UNSPECIFIED
+}
+
+enum CompensationType {
+  NONE
+  REWARD
+  WAGE
+}
+
 enum ApplicationStatus {
   PENDING
   ACCEPTED
@@ -71,6 +89,10 @@ model Project {
   coreUserId  String        @map("core_user_id")
   title       String
   kind        ProjectKind
+  origin      ProjectOrigin    @default(UNSPECIFIED)
+  scope       ProjectScope     @default(UNSPECIFIED)
+  compensationType   CompensationType @default(NONE) @map("compensation_type")
+  compensationAmount Int?      @map("compensation_amount")
   courseCode  String?       @map("course_code")
   size        Int
   duration    String?

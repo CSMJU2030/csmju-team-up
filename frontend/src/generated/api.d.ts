@@ -6,6 +6,9 @@
 export interface components {
   schemas: {
     ProjectKind: "COURSE" | "SENIOR_PROJECT" | "PERSONAL_COMPETITION";
+    ProjectOrigin: "TEACHER_ASSIGNED" | "SELF_CREATED" | "UNSPECIFIED";
+    ProjectScope: "PERSONAL" | "DEPARTMENT" | "UNSPECIFIED";
+    CompensationType: "NONE" | "REWARD" | "WAGE";
     ProjectFormat: "ONLINE" | "ONSITE" | "HYBRID";
     ProjectStatus: "RECRUITING" | "IN_PROGRESS" | "COMPLETED";
     ApplicationStatus: "PENDING" | "ACCEPTED" | "REJECTED";
@@ -53,6 +56,10 @@ export interface components {
       id: string;
       title: string;
       kind: components["schemas"]["ProjectKind"];
+      origin: components["schemas"]["ProjectOrigin"];
+      scope: components["schemas"]["ProjectScope"];
+      compensationType: components["schemas"]["CompensationType"];
+      compensationAmount: number | null;
       courseCode: string | null;
       size: number;
       duration: string | null;

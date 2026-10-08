@@ -7,10 +7,8 @@ import {
   CheckIcon,
   DeleteIcon,
   EditIcon,
-  MessageIcon,
   NotificationsIcon,
   SearchIcon,
-  StarIcon,
 } from "@/csmju";
 import { ConfirmDeleteModal, Modal, PageHeader, StatusBadge, Tabs, cardClass, dangerButtonClass, inputClass, primaryButtonClass, secondaryButtonClass } from "@/csmju";
 import type { Project, Me, Profile, Notification, Conversation } from "./api";
@@ -21,6 +19,9 @@ const kindLabel: Record<Project["kind"], string> = {
   SENIOR_PROJECT: "โปรเจกต์จบ",
   PERSONAL_COMPETITION: "ส่วนตัว / แข่งขัน",
 };
+const originLabel: Record<Project["origin"], string> = { TEACHER_ASSIGNED: "อาจารย์มอบหมาย", SELF_CREATED: "ตั้งเอง", UNSPECIFIED: "ยังไม่ระบุ" };
+const scopeLabel: Record<Project["scope"], string> = { PERSONAL: "งานส่วนตัว", DEPARTMENT: "งานสาขา", UNSPECIFIED: "ยังไม่ระบุ" };
+const compensationLabel: Record<Project["compensationType"], string> = { NONE: "ไม่มีค่าตอบแทน", REWARD: "เงินรางวัล", WAGE: "ค่าจ้าง" };
 const formatLabel: Record<Project["format"], string> = { ONLINE: "ออนไลน์", ONSITE: "ออนไซต์", HYBRID: "ผสม" };
 const statusLabel: Record<Project["status"], string> = {
   RECRUITING: "กำลังหาคน",
@@ -51,6 +52,8 @@ export default function TeamUpApp() {
   const [tab, setTab] = useState<Tab>("all");
   const [status, setStatus] = useState("");
   const [kind, setKind] = useState("");
+  const [origin, setOrigin] = useState("");
+  const [scope, setScope] = useState("");
   const [format, setFormat] = useState("");
   const [skill, setSkill] = useState("");
   const [selected, setSelected] = useState<Project | null>(null);
@@ -128,19 +131,15 @@ export default function TeamUpApp() {
         }
         if (status && p.status !== status) return false;
         if (kind && p.kind !== kind) return false;
+        if (origin && p.origin !== origin) return false;
+        if (scope && p.scope !== scope) return false;
         if (format && p.format !== format) return false;
         if (skill && !p.skills.includes(skill)) return false;
         if (q && ![p.title, p.description, p.roles.join(" "), p.skills.join(" "), p.courseCode ?? ""].join(" ").toLowerCase().includes(q)) return false;
         return true;
       })
-      .sort((a, b) => (tab === "recommended" ? recommendationScore(b) - recommendationScore(a) : b.createdAt.localeCompare(a.createdAt)));
-  }, [projects, tab, status, kind, format, skill, query, profile]);
-
-  function recommendationScore(project: Project) {
-    if (!profile?.skills?.length) return 0;
-    const wanted = new Set(profile.skills.map((x) => x.toLowerCase()));
-    return project.skills.filter((x) => wanted.has(x.toLowerCase())).length;
-  }
+      .sort((a, b) => (tab === "recommended" ? recommendationScore(b, profile) - recommendationScore(a, profile) : b.createdAt.localeCompare(a.createdAt)));
+  }, [projects, tab, status, kind, origin, scope, format, skill, query, profile]);
 
   async function createProject(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -175,6 +174,10 @@ export default function TeamUpApp() {
     return {
       title: String(form.get("title") ?? "").trim(),
       kind: String(form.get("kind")),
+      origin: String(form.get("origin")),
+      scope: String(form.get("scope")),
+      compensationType: String(form.get("compensationType")),
+      compensationAmount: String(form.get("compensationAmount") ?? "").trim() ? Number(form.get("compensationAmount")) : undefined,
       courseCode: String(form.get("courseCode") ?? "").trim() || undefined,
       size: Number(form.get("size")),
       duration: String(form.get("duration") ?? "").trim() || undefined,
@@ -252,7 +255,7 @@ export default function TeamUpApp() {
             <FilterSelect id="format-filter" label="รูปแบบ" value={format} onChange={setFormat} options={["ONLINE", "ONSITE", "HYBRID"]} labels={formatLabel} />
             <FilterSelect id="status-filter" label="สถานะ" value={status} onChange={setStatus} options={["RECRUITING", "IN_PROGRESS", "COMPLETED"]} labels={statusLabel} />
           </div>
-          <div className="mt-4 flex flex-wrap items-end gap-3">
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div className="min-w-48">
               <label htmlFor="skill-filter" className="mb-1.5 block text-label-sm font-semibold">Skill</label>
               <select id="skill-filter" value={skill} onChange={(e) => setSkill(e.target.value)} className={inputClass}>
@@ -260,8 +263,10 @@ export default function TeamUpApp() {
                 {skills.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </div>
-            <button type="button" className={secondaryButtonClass} onClick={() => { setQuery(""); setKind(""); setFormat(""); setStatus(""); setSkill(""); }}>ล้างตัวกรอง</button>
-            <div className="ml-auto flex items-center gap-2">
+            <FilterSelect id="origin-filter" label="แหล่งที่มา" value={origin} onChange={setOrigin} options={["TEACHER_ASSIGNED", "SELF_CREATED", "UNSPECIFIED"]} labels={originLabel} />
+            <FilterSelect id="scope-filter" label="ขอบเขตงาน" value={scope} onChange={setScope} options={["PERSONAL", "DEPARTMENT", "UNSPECIFIED"]} labels={scopeLabel} />
+            <button type="button" className={secondaryButtonClass} onClick={() => { setQuery(""); setKind(""); setOrigin(""); setScope(""); setFormat(""); setStatus(""); setSkill(""); }}>ล้างตัวกรอง</button>
+            <div className="flex items-center gap-2 sm:justify-end lg:col-span-1">
               <button type="button" aria-label="การแจ้งเตือน" className="relative rounded-lg border border-outline-variant px-3 py-2.5 text-on-surface-variant hover:bg-surface-variant/50" onClick={() => setShowNotifications(true)}>
                 <NotificationsIcon className="h-5 w-5" />
                 {unread ? <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-error px-1 text-center text-caption text-white">{unread}</span> : null}
@@ -356,7 +361,23 @@ export default function TeamUpApp() {
 }
 
 function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void }) {
-  return <article className={`${cardClass} p-5`}><div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-primary-container/10 px-2.5 py-1 text-label-sm text-primary-container">{kindLabel[project.kind]}</span><StatusBadge tone={statusTone[project.status]} label={statusLabel[project.status]} />{project.acceptedCount >= project.size ? <StatusBadge tone="neutral" label="เต็มแล้ว" /> : null}</div><h2 className="mt-4 text-headline-md font-semibold">{project.title}</h2><p className="mt-2 line-clamp-3 text-body-md text-on-surface-variant">{project.description}</p><div className="mt-4 flex flex-wrap gap-2">{project.skills.slice(0, 5).map((s) => <span key={s} className="rounded-lg border border-outline-variant px-2.5 py-1 text-label-sm">{s}</span>)}</div><div className="mt-5 grid gap-3 border-t border-outline-variant/50 pt-4 sm:grid-cols-[1fr_auto] sm:items-end"><div><p className="text-label-sm text-on-surface-variant">{formatLabel[project.format]} · {project.acceptedCount}/{project.size} คน</p><p className="mt-1 text-label-sm text-on-surface-variant">เจ้าของ {project.owner.coreUserId}</p></div><button type="button" onClick={onOpen} className={secondaryButtonClass}>ดูรายละเอียด</button></div></article>;
+  return (
+    <article className={`${cardClass} p-5`}>
+      <div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-primary-container/10 px-2.5 py-1 text-label-sm text-primary-container">{kindLabel[project.kind]}</span><StatusBadge tone={statusTone[project.status]} label={statusLabel[project.status]} />{project.acceptedCount >= project.size ? <StatusBadge tone="neutral" label="เต็มแล้ว" /> : null}</div>
+      <div className="mt-2 flex flex-wrap gap-2"><StatusBadge tone="info" label={originLabel[project.origin]} /><StatusBadge tone="neutral" label={scopeLabel[project.scope]} /></div>
+      <h2 className="mt-4 text-headline-md font-semibold">{project.title}</h2>
+      <p className="mt-2 line-clamp-3 text-body-md text-on-surface-variant">{project.description}</p>
+      {project.compensationType !== "NONE" && project.compensationAmount ? <p className="mt-2 font-semibold text-on-surface">{compensationLabel[project.compensationType]} · {formatBudget(project.compensationAmount)} บาท</p> : null}
+      <div className="mt-4 flex flex-wrap gap-2">{project.skills.slice(0, 5).map((s) => <span key={s} className="rounded-lg border border-outline-variant px-2.5 py-1 text-label-sm">{s}</span>)}</div>
+      <div className="mt-5 grid gap-3 border-t border-outline-variant/50 pt-4 sm:grid-cols-[1fr_auto] sm:items-end"><div><p className="text-label-sm text-on-surface-variant">{formatLabel[project.format]} · {project.acceptedCount}/{project.size} คน</p><p className="mt-1 text-label-sm text-on-surface-variant">เจ้าของ {project.owner.coreUserId}</p></div><button type="button" onClick={onOpen} className={secondaryButtonClass}>ดูรายละเอียด</button></div>
+    </article>
+  );
+}
+
+function recommendationScore(project: Project, profile: Profile) {
+  if (!profile?.skills?.length) return 0;
+  const wanted = new Set(profile.skills.map((skill) => skill.toLowerCase()));
+  return project.skills.filter((skill) => wanted.has(skill.toLowerCase())).length;
 }
 
 function ProjectModal({ project, me, busy, onClose, onEdit, onAction }: { project: Project; me: Me | null; busy: boolean; onClose: () => void; onEdit: () => void; onAction: (path: string, method?: string, body?: unknown, success?: string) => Promise<void> }) {
@@ -377,7 +398,8 @@ function ProjectModal({ project, me, busy, onClose, onEdit, onAction }: { projec
   return <>
   <Modal title={project.title} onClose={onClose}><div className="space-y-5">
     <div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-primary-container/10 px-2.5 py-1 text-label-sm text-primary-container">{kindLabel[project.kind]}</span><StatusBadge tone={statusTone[project.status]} label={statusLabel[project.status]} /><span className="text-label-sm text-on-surface-variant">{project.acceptedCount}/{project.size} คน</span></div>
-    <div><p className="text-body-md text-on-surface">{project.description}</p><p className="mt-2 text-label-sm text-on-surface-variant">{project.format ? formatLabel[project.format] : ""}{project.duration ? ` · ${project.duration}` : ""}{project.courseCode ? ` · ${project.courseCode}` : ""}</p></div>
+    <div className="flex flex-wrap gap-2"><StatusBadge tone="info" label={originLabel[project.origin]} /><StatusBadge tone="neutral" label={scopeLabel[project.scope]} /><StatusBadge tone={project.compensationType === "NONE" ? "neutral" : "success"} label={compensationLabel[project.compensationType]} /></div>
+    <div><p className="text-body-md text-on-surface">{project.description}</p><p className="mt-2 text-label-sm text-on-surface-variant">{project.format ? formatLabel[project.format] : ""}{project.duration ? ` · ${project.duration}` : ""}{project.courseCode ? ` · ${project.courseCode}` : ""}</p>{project.compensationAmount ? <p className="mt-2 font-semibold text-on-surface">งบรวม {formatBudget(project.compensationAmount)} บาท</p> : null}</div>
     {owned ? <div className="rounded-lg bg-surface-container-low p-3"><label htmlFor="project-status" className="mb-1.5 block text-label-sm font-semibold">สถานะโปรเจกต์</label><select id="project-status" value={project.status} disabled={busy} onChange={(event) => void onAction(`/api/v1/projects/${project.id}/status`, "PATCH", { status: event.target.value }, "อัปเดตสถานะแล้ว")} className={inputClass}><option value="RECRUITING">กำลังหาคน</option><option value="IN_PROGRESS">กำลังพัฒนา</option><option value="COMPLETED">เสร็จสมบูรณ์</option></select></div> : null}
     <TagSection title="ตำแหน่งที่ต้องการ" items={project.roles} /><TagSection title="Skill ที่ต้องการ" items={project.skills} />
 
@@ -394,7 +416,7 @@ function ProjectModal({ project, me, busy, onClose, onEdit, onAction }: { projec
 
     <section className="rounded-lg border border-outline-variant p-4"><h3 className="text-headline-sm font-semibold">ถาม-ตอบ</h3><div className="mt-3 space-y-3">{project.questions.map((item) => <div key={item.id} className="rounded-lg bg-surface-container-low p-3"><p className="font-semibold">ถาม: {item.question}</p>{item.answer ? <p className="mt-2 text-body-md text-on-surface-variant">ตอบ: {item.answer}</p> : owned ? <div className="mt-2 flex gap-2"><input id={`answer-${item.id}`} value={answer[item.id] ?? ""} onChange={(e) => setAnswer({ ...answer, [item.id]: e.target.value })} className={inputClass} placeholder="พิมพ์คำตอบ" /><button type="button" disabled={busy || !answer[item.id]?.trim()} className={primaryButtonClass} onClick={() => void onAction(`/api/v1/projects/${project.id}/questions/${item.id}`, "PATCH", { answer: answer[item.id].trim() }, "ตอบคำถามแล้ว")}>ตอบ</button></div> : <p className="mt-2 text-label-sm text-on-surface-variant">รอเจ้าของตอบ</p>}</div>)}{!project.questions.length ? <p className="text-label-sm text-on-surface-variant">ยังไม่มีคำถาม</p> : null}</div>{!owned ? <div className="mt-3 flex gap-2"><input id="project-question" value={question} onChange={(e) => setQuestion(e.target.value)} className={inputClass} placeholder="ถามก่อนสมัคร..." /><button type="button" disabled={busy || !question.trim()} className={primaryButtonClass} onClick={() => void onAction(`/api/v1/projects/${project.id}/questions`, "POST", { question: question.trim() }, "ส่งคำถามแล้ว")}>ถาม</button></div> : null}</section>
 
-    {reviewable ? <section className="rounded-lg border border-outline-variant p-4"><h3 className="text-headline-sm font-semibold">รีวิวสมาชิก</h3><div className="mt-3 flex flex-wrap items-center gap-1">{[1,2,3,4,5].map((value) => <button key={value} type="button" aria-label={`ให้ ${value} ดาว`} onClick={() => setStars(value)} className="rounded-lg p-1 hover:bg-surface-container"><StarIcon className={`h-6 w-6 ${value <= stars ? "fill-current text-amber-500" : "text-outline"}`} /></button>)}</div><label htmlFor="review-comment" className="mt-3 mb-1.5 block text-label-sm font-semibold">คอมเมนต์</label><textarea id="review-comment" value={comment} onChange={(e) => setComment(e.target.value)} className={`${inputClass} min-h-24`} placeholder="คอมเมนต์สั้น ๆ (ไม่บังคับ)" /><button type="button" disabled={!stars || busy} className={`${primaryButtonClass} mt-3`} onClick={() => { const target = owned ? project.members.find((m) => !m.isCurrentUser)?.coreUserId : project.owner.coreUserId; if (target) void onAction(`/api/v1/projects/${project.id}/reviews`, "POST", { toCoreUserId: target, stars, comment: comment.trim() || undefined }, "ส่งรีวิวแล้ว"); }}>ส่งรีวิว</button></section> : null}
+    {reviewable ? <section className="rounded-lg border border-outline-variant p-4"><h3 className="text-headline-sm font-semibold">รีวิวสมาชิก</h3><div className="mt-3 flex flex-wrap items-center gap-1">{[1,2,3,4,5].map((value) => <button key={value} type="button" aria-label={`ให้ ${value} ดาว`} aria-pressed={stars === value} onClick={() => setStars(value)} className={`h-9 w-9 rounded-lg border text-label-md font-semibold ${stars === value ? "border-primary bg-primary-fixed text-on-surface" : "border-outline-variant hover:bg-surface-container"}`}>{value}</button>)}</div><label htmlFor="review-comment" className="mt-3 mb-1.5 block text-label-sm font-semibold">คอมเมนต์</label><textarea id="review-comment" value={comment} onChange={(e) => setComment(e.target.value)} className={`${inputClass} min-h-24`} placeholder="คอมเมนต์สั้น ๆ (ไม่บังคับ)" /><button type="button" disabled={!stars || busy} className={`${primaryButtonClass} mt-3`} onClick={() => { const target = owned ? project.members.find((m) => !m.isCurrentUser)?.coreUserId : project.owner.coreUserId; if (target) void onAction(`/api/v1/projects/${project.id}/reviews`, "POST", { toCoreUserId: target, stars, comment: comment.trim() || undefined }, "ส่งรีวิวแล้ว"); }}>ส่งรีวิว</button></section> : null}
 
     <div className="flex flex-wrap justify-end gap-3">{!owned ? <button type="button" className={secondaryButtonClass} disabled={busy} onClick={() => void onAction(`/api/v1/projects/${project.id}/follow`, "POST", undefined, project.isFollowing ? "เลิกติดตามแล้ว" : "ติดตามแล้ว")}>{project.isFollowing ? "เลิกติดตาม" : "ติดตามโปรเจกต์"}</button> : null}{owned ? <button type="button" className={secondaryButtonClass} onClick={onEdit}><EditIcon className="h-4 w-4" />แก้ไข</button> : null}{owned ? <button type="button" className={dangerButtonClass} onClick={() => setConfirmDelete(true)}><DeleteIcon className="h-4 w-4" />ลบโปรเจกต์</button> : null}<button type="button" className={secondaryButtonClass} onClick={onClose}>ปิด</button></div>
   </div></Modal>
@@ -411,7 +433,36 @@ function EditProjectModal({ project, onClose, onSubmit, busy }: { project: Proje
 }
 
 function ProjectForm({ project, onClose, onSubmit, busy, submitLabel }: { project?: Project; onClose: () => void; onSubmit: (event: FormEvent<HTMLFormElement>) => void; busy: boolean; submitLabel: string }) {
-  return <form onSubmit={onSubmit} className="space-y-4"><FieldInput id="project-title" name="title" label="ชื่อโปรเจกต์" required defaultValue={project?.title ?? ""} /><div className="grid gap-4 md:grid-cols-2"><div><label htmlFor="project-kind" className="mb-1.5 block text-label-sm font-semibold">ประเภท <span aria-hidden>*</span></label><select id="project-kind" name="kind" required aria-required="true" defaultValue={project?.kind ?? "COURSE"} className={inputClass}><option value="COURSE">งานรายวิชา</option><option value="SENIOR_PROJECT">โปรเจกต์จบ</option><option value="PERSONAL_COMPETITION">ส่วนตัว / แข่งขัน</option></select></div><FieldInput id="project-course" name="courseCode" label="รหัสวิชา" defaultValue={project?.courseCode ?? ""} /></div><div className="grid gap-4 md:grid-cols-3"><FieldInput id="project-size" name="size" label="จำนวนสมาชิก" type="number" min={1} max={100} required defaultValue={project?.size ?? 4} /><FieldInput id="project-duration" name="duration" label="ระยะเวลา" defaultValue={project?.duration ?? ""} /><div><label htmlFor="project-format" className="mb-1.5 block text-label-sm font-semibold">รูปแบบ</label><select id="project-format" name="format" defaultValue={project?.format ?? "HYBRID"} className={inputClass}><option value="ONLINE">ออนไลน์</option><option value="ONSITE">ออนไซต์</option><option value="HYBRID">ผสม</option></select></div></div><div><label htmlFor="project-description" className="mb-1.5 block text-label-sm font-semibold">รายละเอียด <span aria-hidden>*</span></label><textarea id="project-description" name="description" required aria-required="true" defaultValue={project?.description ?? ""} className={`${inputClass} min-h-28`} /></div><FieldInput id="project-roles" name="roles" label="ตำแหน่งที่ต้องการ" defaultValue={project?.roles.join(", ") ?? ""} placeholder="Frontend, Backend" /><FieldInput id="project-skills" name="skills" label="Skill ที่ต้องการ" defaultValue={project?.skills.join(", ") ?? ""} placeholder="React, Node.js" /><FieldInput id="project-contact" name="contactText" label="ช่องทางติดต่อ" defaultValue={project?.contactText ?? ""} /><div className="flex justify-end gap-3"><button type="button" onClick={onClose} className={secondaryButtonClass}>ยกเลิก</button><button type="submit" disabled={busy} className={primaryButtonClass}>{submitLabel}</button></div></form>;
+  const [compensationType, setCompensationType] = useState<Project["compensationType"]>(project?.compensationType ?? "NONE");
+  const [compensationAmount, setCompensationAmount] = useState(project?.compensationAmount?.toString() ?? "");
+
+  return (
+    <form onSubmit={onSubmit} className="space-y-4">
+      <FieldInput id="project-title" name="title" label="ชื่อโปรเจกต์" required defaultValue={project?.title ?? ""} />
+      <div className="grid gap-4 md:grid-cols-2">
+        <div><label htmlFor="project-kind" className="mb-1.5 block text-label-sm font-semibold">ประเภท <span aria-hidden>*</span></label><select id="project-kind" name="kind" required aria-required="true" defaultValue={project?.kind ?? "COURSE"} className={inputClass}><option value="COURSE">งานรายวิชา</option><option value="SENIOR_PROJECT">โปรเจกต์จบ</option><option value="PERSONAL_COMPETITION">ส่วนตัว / แข่งขัน</option></select></div>
+        <FieldInput id="project-course" name="courseCode" label="รหัสวิชา" defaultValue={project?.courseCode ?? ""} />
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <div><label htmlFor="project-origin" className="mb-1.5 block text-label-sm font-semibold">แหล่งที่มา</label><select id="project-origin" name="origin" defaultValue={project?.origin ?? "SELF_CREATED"} className={inputClass}>{project?.origin === "UNSPECIFIED" ? <option value="UNSPECIFIED">ยังไม่ระบุ</option> : null}<option value="TEACHER_ASSIGNED">งานที่อาจารย์มอบหมาย</option><option value="SELF_CREATED">งานที่ตั้งเอง</option></select></div>
+        <div><label htmlFor="project-scope" className="mb-1.5 block text-label-sm font-semibold">ขอบเขตงาน</label><select id="project-scope" name="scope" defaultValue={project?.scope ?? "PERSONAL"} className={inputClass}>{project?.scope === "UNSPECIFIED" ? <option value="UNSPECIFIED">ยังไม่ระบุ</option> : null}<option value="PERSONAL">งานส่วนตัว</option><option value="DEPARTMENT">งานสาขา</option></select></div>
+      </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        <FieldInput id="project-size" name="size" label="จำนวนสมาชิก" type="number" min={1} max={100} required defaultValue={project?.size ?? 4} />
+        <FieldInput id="project-duration" name="duration" label="ระยะเวลา" defaultValue={project?.duration ?? ""} />
+        <div><label htmlFor="project-format" className="mb-1.5 block text-label-sm font-semibold">รูปแบบ</label><select id="project-format" name="format" defaultValue={project?.format ?? "HYBRID"} className={inputClass}><option value="ONLINE">ออนไลน์</option><option value="ONSITE">ออนไซต์</option><option value="HYBRID">ผสม</option></select></div>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <div><label htmlFor="project-compensation" className="mb-1.5 block text-label-sm font-semibold">ค่าตอบแทน</label><select id="project-compensation" name="compensationType" value={compensationType} onChange={(event) => setCompensationType(event.target.value as Project["compensationType"])} className={inputClass}><option value="NONE">ไม่มี</option><option value="REWARD">เงินรางวัล</option><option value="WAGE">ค่าจ้าง</option></select></div>
+        {compensationType !== "NONE" ? <FieldInput id="project-compensation-amount" name="compensationAmount" label="งบรวม (บาท)" type="number" min={1} max={100000000} required value={compensationAmount} onChange={setCompensationAmount} /> : null}
+      </div>
+      <div><label htmlFor="project-description" className="mb-1.5 block text-label-sm font-semibold">รายละเอียด <span aria-hidden>*</span></label><textarea id="project-description" name="description" required aria-required="true" defaultValue={project?.description ?? ""} className={`${inputClass} min-h-28`} /></div>
+      <FieldInput id="project-roles" name="roles" label="ตำแหน่งที่ต้องการ" defaultValue={project?.roles.join(", ") ?? ""} placeholder="Frontend, Backend" />
+      <FieldInput id="project-skills" name="skills" label="Skill ที่ต้องการ" defaultValue={project?.skills.join(", ") ?? ""} placeholder="React, Node.js" />
+      <FieldInput id="project-contact" name="contactText" label="ช่องทางติดต่อ" defaultValue={project?.contactText ?? ""} />
+      <div className="flex justify-end gap-3"><button type="button" onClick={onClose} className={secondaryButtonClass}>ยกเลิก</button><button type="submit" disabled={busy} className={primaryButtonClass}>{submitLabel}</button></div>
+    </form>
+  );
 }
 
 function NotificationsModal({ items, onClose, onRead }: { items: Notification[]; onClose: () => void; onRead: (id: string) => void }) {
@@ -433,3 +484,4 @@ function EmptyState({ title, description }: { title: string; description: string
 function LoadingState() { return <div className="space-y-5" role="status" aria-live="polite"><PageHeader title="CS TeamUp" description="กำลังโหลดข้อมูลโปรเจกต์ของคุณ..." /><div className="grid gap-5 md:grid-cols-2">{[1,2,3,4].map((item) => <div key={item} className={`${cardClass} h-52 animate-pulse bg-surface-container`} />)}</div></div>; }
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) { return <div className="rounded-xl border border-error bg-error-container p-6" role="alert"><h1 className="text-headline-md font-semibold text-on-error-container">เกิดข้อผิดพลาด</h1><p className="mt-2 text-body-md text-on-error-container">{message}</p><button type="button" onClick={onRetry} className={`${secondaryButtonClass} mt-4`}>ลองอีกครั้ง</button></div>; }
 function splitField(value: FormDataEntryValue | null) { return String(value ?? "").split(",").map((x) => x.trim()).filter(Boolean); }
+function formatBudget(amount: number) { return new Intl.NumberFormat("th-TH").format(amount); }

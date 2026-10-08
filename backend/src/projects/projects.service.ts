@@ -1,4 +1,4 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../common/prisma.service.js";
 import type { CoreIdentity } from "../auth/decorators/current-user.js";
 import type { ListProjectsDto, CreateProjectDto, ApplyProjectDto, InviteProjectDto, AskQuestionDto, AnswerQuestionDto, ReviewDto, MessageDto } from "./projects.dto.js";
@@ -22,6 +22,8 @@ export class ProjectsService {
     const limit = query.limit ?? 20;
     const where = {
       ...(query.kind ? { kind: query.kind } : {}),
+      ...(query.origin ? { origin: query.origin } : {}),
+      ...(query.scope ? { scope: query.scope } : {}),
       ...(query.status ? { status: query.status } : {}),
       ...(query.format ? { format: query.format } : {}),
       ...(query.skill ? { skills: { some: { skill: { contains: query.skill, mode: "insensitive" as const } } } } : {}),
@@ -47,10 +49,12 @@ export class ProjectsService {
   }
 
   async create(user: CoreIdentity, dto: CreateProjectDto) {
+    const compensation = this.compensationFields(dto.compensationType ?? "NONE", dto.compensationAmount);
     const p = await this.prisma.project.create({
       data: {
         coreUserId: user.coreUserId,
         title: dto.title.trim(), kind: dto.kind, courseCode: dto.courseCode?.trim() || null,
+        origin: dto.origin ?? "SELF_CREATED", scope: dto.scope ?? "PERSONAL", ...compensation,
         size: dto.size, duration: dto.duration?.trim() || null, format: dto.format,
         description: dto.description.trim(), contactText: dto.contactText?.trim() || null,
         roles: { create: this.clean(dto.roles).map((role) => ({ role })) },
@@ -63,6 +67,11 @@ export class ProjectsService {
   async update(user: CoreIdentity, id: string, dto: CreateProjectDto) {
     const existing = await this.prisma.project.findUnique({ where: { id }, include: this.include });
     this.assertOwner(existing?.coreUserId, user);
+    if (!existing) throw new NotFoundException("Project not found");
+    const compensation = this.compensationFields(
+      dto.compensationType ?? existing.compensationType,
+      dto.compensationAmount ?? existing.compensationAmount ?? undefined,
+    );
     const p = await this.prisma.$transaction(async (tx) => {
       await tx.projectRole.deleteMany({ where: { projectId: id } });
       await tx.projectSkill.deleteMany({ where: { projectId: id } });
@@ -70,6 +79,7 @@ export class ProjectsService {
         where: { id },
         data: {
           title: dto.title.trim(), kind: dto.kind, courseCode: dto.courseCode?.trim() || null,
+          origin: dto.origin ?? existing.origin, scope: dto.scope ?? existing.scope, ...compensation,
           size: dto.size, duration: dto.duration?.trim() || null, format: dto.format,
           description: dto.description.trim(), contactText: dto.contactText?.trim() || null,
           roles: { create: this.clean(dto.roles).map((role) => ({ role })) },
@@ -269,13 +279,22 @@ export class ProjectsService {
   }
 
   private clean(values: string[]) { return [...new Set(values.map((v) => v.trim()).filter(Boolean))]; }
+  private compensationFields(type: string, amount?: number) {
+    if (type === "NONE") return { compensationType: "NONE" as const, compensationAmount: null };
+    if (!Number.isSafeInteger(amount) || amount! < 1 || amount! > 100000000) {
+      throw new BadRequestException("A positive total budget is required for paid projects");
+    }
+    return { compensationType: type as "REWARD" | "WAGE", compensationAmount: amount! };
+  }
   private assertOwner(ownerId: string | undefined, user: CoreIdentity) { if (!ownerId) throw new NotFoundException("Project not found"); if (ownerId !== user.coreUserId) throw new ForbiddenException("You do not own this project"); }
   private present(p: any, user: CoreIdentity) {
     const acceptedCount = p.members.length;
     const ratingRows = p.reviews.filter((r: any) => r.toCoreUserId === p.coreUserId);
     const ownerRating = ratingRows.length ? Number((ratingRows.reduce((sum: number, r: any) => sum + r.stars, 0) / ratingRows.length).toFixed(1)) : null;
     return {
-      id: p.id, title: p.title, kind: p.kind, courseCode: p.courseCode, size: p.size,
+      id: p.id, title: p.title, kind: p.kind, origin: p.origin, scope: p.scope,
+      compensationType: p.compensationType, compensationAmount: p.compensationAmount,
+      courseCode: p.courseCode, size: p.size,
       duration: p.duration, format: p.format, description: p.description, status: p.status,
       contactText: p.contactText, createdAt: p.createdAt.toISOString(), updatedAt: p.updatedAt.toISOString(),
       owner: { coreUserId: p.coreUserId, isCurrentUser: p.coreUserId === user.coreUserId, rating: ownerRating },

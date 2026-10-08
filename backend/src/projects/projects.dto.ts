@@ -5,12 +5,17 @@ import { Type } from "class-transformer";
 export enum ProjectKindDto { COURSE = "COURSE", SENIOR_PROJECT = "SENIOR_PROJECT", PERSONAL_COMPETITION = "PERSONAL_COMPETITION" }
 export enum ProjectFormatDto { ONLINE = "ONLINE", ONSITE = "ONSITE", HYBRID = "HYBRID" }
 export enum ProjectStatusDto { RECRUITING = "RECRUITING", IN_PROGRESS = "IN_PROGRESS", COMPLETED = "COMPLETED" }
+export enum ProjectOriginDto { TEACHER_ASSIGNED = "TEACHER_ASSIGNED", SELF_CREATED = "SELF_CREATED", UNSPECIFIED = "UNSPECIFIED" }
+export enum ProjectScopeDto { PERSONAL = "PERSONAL", DEPARTMENT = "DEPARTMENT", UNSPECIFIED = "UNSPECIFIED" }
+export enum CompensationTypeDto { NONE = "NONE", REWARD = "REWARD", WAGE = "WAGE" }
 
 export class ListProjectsDto {
   @ApiPropertyOptional({ default: 1, minimum: 1 }) @IsOptional() @Type(() => Number) @IsInt() @IsPositive() page = 1;
   @ApiPropertyOptional({ default: 20, minimum: 1, maximum: 100 }) @IsOptional() @Type(() => Number) @IsInt() @IsPositive() @Max(100) limit = 20;
   @ApiPropertyOptional({ maxLength: 120 }) @IsOptional() @IsString() @MaxLength(120) q?: string;
   @ApiPropertyOptional({ enum: ProjectKindDto }) @IsOptional() @IsEnum(ProjectKindDto) kind?: ProjectKindDto;
+  @ApiPropertyOptional({ enum: ProjectOriginDto }) @IsOptional() @IsEnum(ProjectOriginDto) origin?: ProjectOriginDto;
+  @ApiPropertyOptional({ enum: ProjectScopeDto }) @IsOptional() @IsEnum(ProjectScopeDto) scope?: ProjectScopeDto;
   @ApiPropertyOptional({ enum: ProjectStatusDto }) @IsOptional() @IsEnum(ProjectStatusDto) status?: ProjectStatusDto;
   @ApiPropertyOptional({ enum: ProjectFormatDto }) @IsOptional() @IsEnum(ProjectFormatDto) format?: ProjectFormatDto;
   @ApiPropertyOptional({ maxLength: 80 }) @IsOptional() @IsString() @MaxLength(80) skill?: string;
@@ -20,6 +25,10 @@ export class ListProjectsDto {
 export class CreateProjectDto {
   @ApiProperty({ minLength: 1, maxLength: 160 }) @IsString() @MinLength(1) @MaxLength(160) title!: string;
   @ApiProperty({ enum: ProjectKindDto }) @IsEnum(ProjectKindDto) kind!: ProjectKindDto;
+  @ApiPropertyOptional({ enum: ProjectOriginDto, default: ProjectOriginDto.SELF_CREATED }) @IsOptional() @IsEnum(ProjectOriginDto) origin?: ProjectOriginDto;
+  @ApiPropertyOptional({ enum: ProjectScopeDto, default: ProjectScopeDto.PERSONAL }) @IsOptional() @IsEnum(ProjectScopeDto) scope?: ProjectScopeDto;
+  @ApiPropertyOptional({ enum: CompensationTypeDto, default: CompensationTypeDto.NONE }) @IsOptional() @IsEnum(CompensationTypeDto) compensationType?: CompensationTypeDto;
+  @ApiPropertyOptional({ minimum: 1, maximum: 100000000, description: "Total project budget in THB" }) @IsOptional() @Type(() => Number) @IsInt() @Min(1) @Max(100000000) compensationAmount?: number;
   @ApiPropertyOptional({ maxLength: 50 }) @IsOptional() @IsString() @MaxLength(50) courseCode?: string;
   @ApiProperty({ minimum: 1, maximum: 100 }) @IsInt() @IsPositive() @Max(100) size!: number;
   @ApiPropertyOptional({ maxLength: 120 }) @IsOptional() @IsString() @MaxLength(120) duration?: string;
