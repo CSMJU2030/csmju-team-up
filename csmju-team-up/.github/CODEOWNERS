@@ -1,0 +1,10 @@
+# .github/CODEOWNERS
+# Copy into every csmju-<subsystem> repo, replacing team-up.
+
+# PL ของระบบย่อยนี้ approve คนเดียวก็ merge ได้ทุก PR (ไม่ต้องรอ DevOps/PM)
+# · .github/workflows/ กับ CODEOWNERS แก้ไม่ได้อยู่แล้ว — CI (GH-03) ตกถ้าแตะ
+# · PR ที่ PL เปิดเอง: GitHub ไม่ให้ approve PR ของตัวเอง — แจ้ง DevOps ให้ bypass
+*                       @csmju2030/pl-team-up
+
+# ข้อยกเว้นกฎ (UI-01 · ARC-02) — DevOps เท่านั้นที่ approve ได้ ทีมยกเว้นกฎให้ตัวเองไม่ได้
+/.compliance-exceptions.yml @csmju2030/devops

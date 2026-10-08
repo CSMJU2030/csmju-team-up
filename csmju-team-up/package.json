@@ -1,0 +1,21 @@
+{
+  "name": "csmju-team-up",
+  "private": true,
+  "packageManager": "pnpm@12.3.4",
+  "scripts": {
+    "dev": "pnpm --parallel --filter frontend --filter backend dev",
+    "build": "pnpm --filter backend build && pnpm --filter frontend build",
+    "lint": "pnpm --filter backend lint && pnpm --filter frontend lint",
+    "typecheck": "pnpm --filter backend typecheck && pnpm --filter frontend typecheck",
+    "test": "pnpm --filter backend test",
+    "test:syntax": "pnpm --filter backend exec tsc --noEmit --noCheck && pnpm --filter frontend exec tsc --noEmit --noCheck",
+    "db:generate": "pnpm --filter backend prisma:generate",
+    "db:migrate": "pnpm --filter backend prisma:migrate",
+    "db:deploy": "pnpm --filter backend prisma:deploy",
+    "db:seed": "pnpm --filter backend build:seed",
+    "openapi:generate": "pnpm --filter backend generate:openapi",
+    "generate:api": "pnpm --filter backend generate:openapi && pnpm --filter frontend generate:api",
+    "standards:check": "bash standards/scripts/run-all-checks.sh .",
+    "standards:conformance": "node standards/conformance/run.js"
+  }
+}

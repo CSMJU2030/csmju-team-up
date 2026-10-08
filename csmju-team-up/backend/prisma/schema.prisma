@@ -1,0 +1,258 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+enum ProjectKind {
+  COURSE
+  SENIOR_PROJECT
+  PERSONAL_COMPETITION
+}
+
+enum ProjectFormat {
+  ONLINE
+  ONSITE
+  HYBRID
+}
+
+enum ProjectStatus {
+  RECRUITING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model CollaborationProfile {
+  id           String   @id @default(uuid())
+  coreUserId   String   @unique @map("core_user_id")
+  skills       String[] @default([])
+  githubUrl    String?  @map("github_url")
+  linkedinUrl  String?  @map("linkedin_url")
+  contactText  String?  @map("contact_text")
+  isAvailable  Boolean  @default(true) @map("is_available")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  portfolio    PortfolioItem[]
+
+  @@map("collaboration_profiles")
+}
+
+model PortfolioItem {
+  id         String   @id @default(uuid())
+  coreUserId String   @map("core_user_id")
+  imageId    String   @map("image_id")
+  caption    String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  profile    CollaborationProfile @relation(fields: [coreUserId], references: [coreUserId], onDelete: Cascade)
+
+  @@index([coreUserId])
+  @@map("portfolio_items")
+}
+
+model Project {
+  id          String        @id @default(uuid())
+  coreUserId  String        @map("core_user_id")
+  title       String
+  kind        ProjectKind
+  courseCode  String?       @map("course_code")
+  size        Int
+  duration    String?
+  format      ProjectFormat
+  description String
+  status      ProjectStatus @default(RECRUITING)
+  contactText String?       @map("contact_text")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  roles       ProjectRole[]
+  skills      ProjectSkill[]
+  members     ProjectMember[]
+  applications ProjectApplication[]
+  invitations ProjectInvitation[]
+  follows     ProjectFollow[]
+  questions   ProjectQuestion[]
+  reviews     ProjectReview[]
+
+  @@index([coreUserId])
+  @@index([status])
+  @@index([kind])
+  @@map("projects")
+}
+
+model ProjectRole {
+  id        String  @id @default(uuid())
+  projectId String  @map("project_id")
+  role      String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("project_roles")
+}
+
+model ProjectSkill {
+  id        String  @id @default(uuid())
+  projectId String  @map("project_id")
+  skill     String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([skill])
+  @@map("project_skills")
+}
+
+model ProjectMember {
+  id         String   @id @default(uuid())
+  projectId  String   @map("project_id")
+  coreUserId String   @map("core_user_id")
+  role       String
+  message    String?
+  joinedAt   DateTime @default(now()) @map("joined_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, coreUserId])
+  @@index([coreUserId])
+  @@map("project_members")
+}
+
+model ProjectApplication {
+  id         String            @id @default(uuid())
+  projectId  String            @map("project_id")
+  coreUserId String            @map("core_user_id")
+  role       String?
+  message    String?
+  status     ApplicationStatus @default(PENDING)
+  createdAt  DateTime          @default(now()) @map("created_at")
+  updatedAt  DateTime          @updatedAt @map("updated_at")
+  project    Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, coreUserId])
+  @@index([coreUserId])
+  @@map("project_applications")
+}
+
+model ProjectInvitation {
+  id                String           @id @default(uuid())
+  projectId         String           @map("project_id")
+  inviteeCoreUserId String           @map("invitee_core_user_id")
+  role              String?
+  status            InvitationStatus @default(PENDING)
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+  project           Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, inviteeCoreUserId])
+  @@index([inviteeCoreUserId])
+  @@map("project_invitations")
+}
+
+model ProjectFollow {
+  id         String   @id @default(uuid())
+  projectId  String   @map("project_id")
+  coreUserId String   @map("core_user_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, coreUserId])
+  @@index([coreUserId])
+  @@map("project_follows")
+}
+
+model ProjectQuestion {
+  id            String   @id @default(uuid())
+  projectId     String   @map("project_id")
+  askerCoreUserId String @map("asker_core_user_id")
+  question      String
+  answer        String?
+  answeredAt    DateTime? @map("answered_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([askerCoreUserId])
+  @@map("project_questions")
+}
+
+model ProjectReview {
+  id           String   @id @default(uuid())
+  projectId    String   @map("project_id")
+  fromCoreUserId String @map("from_core_user_id")
+  toCoreUserId String   @map("to_core_user_id")
+  stars        Int
+  comment      String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, fromCoreUserId, toCoreUserId])
+  @@index([toCoreUserId])
+  @@map("project_reviews")
+}
+
+model Conversation {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@map("conversations")
+}
+
+model ConversationParticipant {
+  id             String       @id @default(uuid())
+  conversationId String       @map("conversation_id")
+  coreUserId     String       @map("core_user_id")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, coreUserId])
+  @@index([coreUserId])
+  @@map("conversation_participants")
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String       @map("conversation_id")
+  senderCoreUserId String     @map("sender_core_user_id")
+  body           String
+  createdAt      DateTime     @default(now()) @map("created_at")
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@index([senderCoreUserId])
+  @@map("messages")
+}
+
+model Notification {
+  id           String   @id @default(uuid())
+  coreUserId   String   @map("core_user_id")
+  type         String
+  projectId    String?  @map("project_id")
+  actorCoreUserId String? @map("actor_core_user_id")
+  message      String
+  isRead       Boolean  @default(false) @map("is_read")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([coreUserId, isRead, createdAt])
+  @@map("notifications")
+}

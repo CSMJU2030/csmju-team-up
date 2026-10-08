@@ -1,0 +1,44 @@
+# CSMJU2030 subsystem manifest — source of truth for CI and runtime conformance.
+name: csmju-team-up
+conformance_level: L3
+
+# Frontend is the only public origin and proxies /api/* and /auth/* to backend.
+base_url: http://localhost:3220
+core_hub_url: https://csmju2030.jowave.com
+core_hub_web_url: https://csmju2030.jowave.com
+callback_path: /auth/callback
+
+public_endpoints:
+  - GET /api/health
+  - GET /auth/login
+  - GET /auth/callback
+  - POST /auth/logout
+
+probes:
+  collection: /api/v1/projects
+  not_found: /api/v1/projects/99999999-9999-4999-8999-999999999999
+  invalid_id: /api/v1/projects/not-a-uuid
+  create:
+    path: /api/v1/projects
+    allowed_role: staff
+    denied_role: guest
+    invalid_body:
+      title: ""
+    valid_body:
+      title: "Conformance TeamUp Project"
+      kind: COURSE
+      size: 2
+      format: ONLINE
+      description: "Temporary conformance test project."
+      roles:
+        - Frontend
+      skills:
+        - React
+
+owners:
+  pl: "@csmju2030/pl-team-up"
+  aie: "@csmju2030/aie-team-up"
+
+display_name: "CS TeamUp - Project Collaborator Finder"
+repo: github.com/CSMJU2030/csmju-team-up
+status: proposed
