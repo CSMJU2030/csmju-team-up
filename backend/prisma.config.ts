@@ -1,8 +1,9 @@
 import { defineConfig, env } from "prisma/config";
 import { config as loadEnv } from "dotenv";
+import { fileURLToPath } from "node:url";
 
 if (!process.env.DIRECT_URL && process.argv.includes("generate")) {
-  loadEnv({ path: ".env.example" });
+  loadEnv({ path: fileURLToPath(new URL("./.env.example", import.meta.url)) });
 }
 
 export default defineConfig({
