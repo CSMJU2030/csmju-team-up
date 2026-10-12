@@ -1,4 +1,4 @@
 #!/bin/sh
 set -eu
-/app/node_modules/.bin/prisma migrate deploy --schema /app/backend/prisma/schema.prisma
+cd /app/backend && ./node_modules/.bin/prisma migrate deploy
 exec node /app/backend/dist/main.js

@@ -21,7 +21,7 @@ COPY --from=builder --chown=node:node /app/backend/dist ./backend/dist
 COPY --from=builder --chown=node:node /app/backend/prisma ./backend/prisma
 COPY --from=builder --chown=node:node /app/backend/prisma.config.ts ./backend/prisma.config.ts
 COPY --from=builder --chown=node:node /app/backend/package.json ./backend/package.json
-COPY --from=builder --chown=node:node /app/backend/docker ./backend/docker
+COPY --from=builder --chown=node:node --chmod=755 /app/backend/docker/entrypoint.sh ./backend/docker/entrypoint.sh
 USER node
 EXPOSE 4000
 HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=5 CMD node -e "require('net').connect(4000,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"
