@@ -16,7 +16,8 @@ node_modules/
 dist/
 build/
 coverage/
-generated/          # Prisma 7 client (สร้างใหม่ด้วย prisma generate)
+backend/src/generated/
+*.tsbuildinfo
 
 # ยกเว้นไฟล์ template
 !.env.example

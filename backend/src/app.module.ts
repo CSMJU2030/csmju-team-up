@@ -16,10 +16,18 @@ import { ProfileService } from "./profile/profile.service.js";
 import { MessagesController } from "./projects/messages.controller.js";
 import { NotificationsController } from "./notifications.controller.js";
 import { validateEnv } from "./config/env.js";
+import { CommunityController } from "./community/community.controller.js";
+import { CommunityService } from "./community/community.service.js";
+import { ContributionsController } from "./contributions/contributions.controller.js";
+import { ContributionsService } from "./contributions/contributions.service.js";
+import { ProjectProgressController } from "./progress/project-progress.controller.js";
+import { ProjectProgressService } from "./progress/project-progress.service.js";
+import { RewardsController } from "./rewards/rewards.controller.js";
+import { RewardsService } from "./rewards/rewards.service.js";
 
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true, cache: true, envFilePath: [".env"], validate: validateEnv })],
-  controllers: [SsoCallbackController, HealthController, MeController, ProjectsController, ProfileController, MessagesController, NotificationsController],
-  providers: [AuthService, JwksService, CoreHubTokenVerifier, CoreHubJwtGuard, PermissionsGuard, PrismaService, ProjectsService, ProfileService],
+  controllers: [SsoCallbackController, HealthController, MeController, ProjectsController, ProfileController, MessagesController, NotificationsController, CommunityController, ContributionsController, ProjectProgressController, RewardsController],
+  providers: [AuthService, JwksService, CoreHubTokenVerifier, CoreHubJwtGuard, PermissionsGuard, PrismaService, ProjectsService, ProfileService, CommunityService, ContributionsService, ProjectProgressService, RewardsService],
 })
 export class AppModule {}

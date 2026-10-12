@@ -97,10 +97,47 @@ export class ProjectsService {
     return { id, deleted: true };
   }
 
-  async setStatus(user: CoreIdentity, id: string, status: string) {
-    const existing = await this.prisma.project.findUnique({ where: { id } });
-    this.assertOwner(existing?.coreUserId, user);
-    const p = await this.prisma.project.update({ where: { id }, data: { status: status as any }, include: this.include });
+  async setStatus(user: CoreIdentity, id: string, status: "RECRUITING" | "IN_PROGRESS" | "COMPLETED") {
+    const p = await this.prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM "projects" WHERE id = ${id} FOR UPDATE`;
+      const existing = await tx.project.findUnique({ where: { id } });
+      this.assertOwner(existing?.coreUserId, user);
+      if (!existing) throw new NotFoundException("Project not found");
+      if (existing.status === "COMPLETED" && status !== "COMPLETED") throw new ConflictException("โปรเจกต์ที่ปิดแล้วไม่สามารถย้อนสถานะได้");
+
+      if (status === "COMPLETED" && existing.status !== "COMPLETED") {
+        const projectTasks = await tx.projectTask.findMany({
+          where: { projectId: id },
+          select: { status: true, assignedCoreUserId: true, submissions: { where: { status: "APPROVED" }, select: { submittedByCoreUserId: true } } },
+        });
+        if (!projectTasks.length || projectTasks.some((task) => task.status !== "COMPLETED" || task.submissions.length === 0)) {
+          throw new ConflictException("ปิดโปรเจกต์ได้เมื่องานทุกชิ้นมี submission ที่ผ่านการตรวจพร้อมหลักฐาน");
+        }
+        const recipients = [...new Set(projectTasks
+          .filter((task) => task.submissions.some((submission) => submission.submittedByCoreUserId === task.assignedCoreUserId))
+          .map((task) => task.assignedCoreUserId)
+          .filter((coreUserId): coreUserId is string => coreUserId !== null))];
+        if (!recipients.length) throw new ConflictException("ปิดโปรเจกต์ได้เมื่อมีงานที่มอบหมายและผ่านการตรวจพร้อมหลักฐานอย่างน้อยหนึ่งงาน");
+
+        const rawPoints = process.env.CONTRIBUTION_POINTS_PROJECT;
+        const points = rawPoints === undefined || rawPoints.trim() === "" ? 25 : Number(rawPoints);
+        if (!Number.isSafeInteger(points) || points < 0 || points > 1000) throw new Error("CONTRIBUTION_POINTS_PROJECT must be an integer from 0 to 1000");
+        if (points > 0) {
+          await tx.contributionPointTransaction.createMany({
+            data: recipients.map((coreUserId) => ({
+              coreUserId, points, transactionType: "AWARD" as const, reason: `โบนัสปิดโปรเจกต์: ${existing.title}`,
+              eventKey: `project-completion-award:${id}:${coreUserId}`, createdByCoreUserId: user.coreUserId,
+            })),
+            skipDuplicates: true,
+          });
+        }
+        await tx.projectProgressEvent.create({ data: { projectId: id, actorCoreUserId: user.coreUserId, eventType: "PROJECT_COMPLETED", message: `ปิดโปรเจกต์: ${existing.title}` } });
+        await tx.notification.createMany({
+          data: recipients.map((coreUserId) => ({ coreUserId, type: "PROJECT_COMPLETED", projectId: id, actorCoreUserId: user.coreUserId, message: `โปรเจกต์เสร็จสมบูรณ์: ${existing.title}` })),
+        });
+      }
+      return tx.project.update({ where: { id }, data: { status }, include: this.include });
+    });
     return this.present(p, user);
   }
 
