@@ -425,11 +425,11 @@ function ProjectModal({ project, me, busy, onClose, onEdit, onAction }: { projec
 }
 
 function CreateModal({ onClose, onSubmit, busy }: { onClose: () => void; onSubmit: (event: FormEvent<HTMLFormElement>) => void; busy: boolean }) {
-  return <Modal title="สร้างโปรเจกต์" onClose={onClose}><ProjectForm onClose={onClose} onSubmit={onSubmit} busy={busy} submitLabel="สร้างโปรเจกต์" /></Modal>;
+  return <Modal title="สร้างโปรเจกต์" onClose={onClose} size="wide"><ProjectForm onClose={onClose} onSubmit={onSubmit} busy={busy} submitLabel="สร้างโปรเจกต์" /></Modal>;
 }
 
 function EditProjectModal({ project, onClose, onSubmit, busy }: { project: Project; onClose: () => void; onSubmit: (event: FormEvent<HTMLFormElement>) => void; busy: boolean }) {
-  return <Modal title="แก้ไขโปรเจกต์" onClose={onClose}><ProjectForm project={project} onClose={onClose} onSubmit={onSubmit} busy={busy} submitLabel="บันทึกการแก้ไข" /></Modal>;
+  return <Modal title="แก้ไขโปรเจกต์" onClose={onClose} size="wide"><ProjectForm project={project} onClose={onClose} onSubmit={onSubmit} busy={busy} submitLabel="บันทึกการแก้ไข" /></Modal>;
 }
 
 function ProjectForm({ project, onClose, onSubmit, busy, submitLabel }: { project?: Project; onClose: () => void; onSubmit: (event: FormEvent<HTMLFormElement>) => void; busy: boolean; submitLabel: string }) {
