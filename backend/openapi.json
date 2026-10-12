@@ -1004,6 +1004,926 @@
           "Notifications"
         ]
       }
+    },
+    "/v1/community/profiles": {
+      "get": {
+        "operationId": "CommunityController_directory",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 120,
+              "type": "string"
+            }
+          },
+          {
+            "name": "skill",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 80,
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Community Profiles"
+        ]
+      }
+    },
+    "/v1/community/profiles/{coreUserId}": {
+      "get": {
+        "operationId": "CommunityController_profile",
+        "parameters": [
+          {
+            "name": "coreUserId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Community Profiles"
+        ]
+      }
+    },
+    "/v1/community/profile-settings": {
+      "patch": {
+        "operationId": "CommunityController_updatePrivacy",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePrivacyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Community Profiles"
+        ]
+      }
+    },
+    "/v1/community/profile-views/me": {
+      "get": {
+        "operationId": "CommunityController_profileViews",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Community Profiles"
+        ]
+      }
+    },
+    "/v1/contributions/review-queue": {
+      "get": {
+        "operationId": "ContributionsController_listReviewQueue",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Contributions"
+        ]
+      }
+    },
+    "/v1/contributions/me": {
+      "get": {
+        "operationId": "ContributionsController_listMine",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Contributions"
+        ]
+      }
+    },
+    "/v1/contributions": {
+      "post": {
+        "operationId": "ContributionsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContributionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Contributions"
+        ]
+      }
+    },
+    "/v1/contributions/{id}/evidence": {
+      "post": {
+        "operationId": "ContributionsController_addEvidence",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddEvidenceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Contributions"
+        ]
+      }
+    },
+    "/v1/contributions/{id}/submit": {
+      "post": {
+        "operationId": "ContributionsController_submit",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Contributions"
+        ]
+      }
+    },
+    "/v1/contributions/{id}/review": {
+      "post": {
+        "operationId": "ContributionsController_review",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewContributionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Contributions"
+        ]
+      }
+    },
+    "/v1/contributions/points/me": {
+      "get": {
+        "operationId": "ContributionsController_points",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Contributions"
+        ]
+      }
+    },
+    "/v1/projects/{projectId}/progress": {
+      "get": {
+        "operationId": "ProjectProgressController_getProgress",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Project Progress"
+        ]
+      }
+    },
+    "/v1/projects/{projectId}/milestones": {
+      "post": {
+        "operationId": "ProjectProgressController_createMilestone",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMilestoneDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Project Progress"
+        ]
+      }
+    },
+    "/v1/projects/{projectId}/milestones/{milestoneId}": {
+      "patch": {
+        "operationId": "ProjectProgressController_updateMilestone",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "milestoneId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMilestoneDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Project Progress"
+        ]
+      }
+    },
+    "/v1/projects/{projectId}/tasks": {
+      "post": {
+        "operationId": "ProjectProgressController_createTask",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTaskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Project Progress"
+        ]
+      }
+    },
+    "/v1/projects/{projectId}/tasks/{taskId}": {
+      "patch": {
+        "operationId": "ProjectProgressController_updateTask",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "taskId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTaskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Project Progress"
+        ]
+      }
+    },
+    "/v1/projects/{projectId}/tasks/{taskId}/submissions": {
+      "post": {
+        "operationId": "ProjectProgressController_submitTask",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "taskId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskSubmissionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Project Progress"
+        ]
+      }
+    },
+    "/v1/projects/{projectId}/tasks/{taskId}/submissions/{submissionId}/review": {
+      "post": {
+        "operationId": "ProjectProgressController_reviewSubmission",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "taskId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "submissionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewTaskSubmissionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Project Progress"
+        ]
+      }
+    },
+    "/v1/rewards": {
+      "get": {
+        "operationId": "RewardsController_catalog",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Rewards"
+        ]
+      },
+      "post": {
+        "operationId": "RewardsController_createReward",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRewardDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Rewards"
+        ]
+      }
+    },
+    "/v1/rewards/manage": {
+      "get": {
+        "operationId": "RewardsController_manageCatalog",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Rewards"
+        ]
+      }
+    },
+    "/v1/rewards/{rewardId}/activate": {
+      "post": {
+        "operationId": "RewardsController_activateReward",
+        "parameters": [
+          {
+            "name": "rewardId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Rewards"
+        ]
+      }
+    },
+    "/v1/rewards/redemptions/me": {
+      "get": {
+        "operationId": "RewardsController_redemptions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Rewards"
+        ]
+      }
+    },
+    "/v1/rewards/redemptions/pending": {
+      "get": {
+        "operationId": "RewardsController_pendingRedemptions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Rewards"
+        ]
+      }
+    },
+    "/v1/rewards/{rewardId}/redemptions": {
+      "post": {
+        "operationId": "RewardsController_redeem",
+        "parameters": [
+          {
+            "name": "rewardId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRedemptionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Rewards"
+        ]
+      }
+    },
+    "/v1/rewards/redemptions/{redemptionId}/approve": {
+      "post": {
+        "operationId": "RewardsController_approve",
+        "parameters": [
+          {
+            "name": "redemptionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Rewards"
+        ]
+      }
+    },
+    "/v1/rewards/redemptions/{redemptionId}/reject": {
+      "post": {
+        "operationId": "RewardsController_reject",
+        "parameters": [
+          {
+            "name": "redemptionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRedemptionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Rewards"
+        ]
+      }
+    },
+    "/v1/rewards/redemptions/{redemptionId}/fulfill": {
+      "post": {
+        "operationId": "RewardsController_fulfill",
+        "parameters": [
+          {
+            "name": "redemptionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Rewards"
+        ]
+      }
+    },
+    "/v1/rewards/redemptions/{redemptionId}": {
+      "delete": {
+        "operationId": "RewardsController_cancel",
+        "parameters": [
+          {
+            "name": "redemptionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "Rewards"
+        ]
+      }
     }
   },
   "info": {
@@ -1290,6 +2210,369 @@
         "required": [
           "body"
         ]
+      },
+      "UpdatePrivacyDto": {
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "object",
+            "maxLength": 500
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "TEAM",
+              "PRIVATE"
+            ]
+          },
+          "isDiscoverable": {
+            "type": "boolean"
+          },
+          "showContributionPoints": {
+            "type": "boolean"
+          },
+          "profileViewsEnabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateContributionDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 3000
+          },
+          "role": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "workSize": {
+            "type": "string",
+            "enum": [
+              "SMALL",
+              "MEDIUM",
+              "LARGE"
+            ]
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "repositoryUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "demoUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PRIVATE",
+              "TEAM",
+              "PUBLIC"
+            ]
+          }
+        },
+        "required": [
+          "title",
+          "description",
+          "role",
+          "workSize"
+        ]
+      },
+      "AddEvidenceDto": {
+        "type": "object",
+        "properties": {
+          "evidenceType": {
+            "type": "string",
+            "enum": [
+              "REPOSITORY",
+              "DEMO",
+              "DOCUMENT",
+              "OTHER"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 1000
+          },
+          "caption": {
+            "type": "string",
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "evidenceType",
+          "url"
+        ]
+      },
+      "ReviewContributionDto": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "APPROVE",
+              "REJECT"
+            ]
+          },
+          "reviewNote": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "decision"
+        ]
+      },
+      "CreateMilestoneDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "dueAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "weight": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 1
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "UpdateMilestoneDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "description": {
+            "type": "object",
+            "maxLength": 2000
+          },
+          "dueAt": {
+            "type": "object",
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "TODO",
+              "IN_PROGRESS",
+              "BLOCKED",
+              "COMPLETED"
+            ]
+          },
+          "weight": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "CreateTaskDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "milestoneId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "assignedCoreUserId": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "dueAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "workSize": {
+            "type": "string",
+            "enum": [
+              "SMALL",
+              "MEDIUM",
+              "LARGE"
+            ],
+            "default": "SMALL"
+          },
+          "weight": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 1
+          }
+        },
+        "required": [
+          "title",
+          "workSize"
+        ]
+      },
+      "UpdateTaskDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "description": {
+            "type": "object",
+            "maxLength": 2000
+          },
+          "progressNote": {
+            "type": "object",
+            "maxLength": 2000
+          },
+          "blockerNote": {
+            "type": "object",
+            "maxLength": 1000
+          },
+          "assignedCoreUserId": {
+            "type": "object",
+            "maxLength": 64,
+            "nullable": true
+          },
+          "dueAt": {
+            "type": "object",
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "TODO",
+              "IN_PROGRESS",
+              "BLOCKED"
+            ]
+          },
+          "weight": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "TaskSubmissionDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 1000
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "url",
+          "note"
+        ]
+      },
+      "ReviewTaskSubmissionDto": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "APPROVE",
+              "REJECT"
+            ]
+          },
+          "reviewNote": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "decision"
+        ]
+      },
+      "CreateRewardDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "category": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "pointCost": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 1000000
+          },
+          "quantity": {
+            "type": "object",
+            "minimum": 0,
+            "maximum": 1000000,
+            "nullable": true
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "category",
+          "pointCost"
+        ]
+      },
+      "CreateRedemptionDto": {
+        "type": "object",
+        "properties": {
+          "requestNote": {
+            "type": "string",
+            "maxLength": 500
+          }
+        }
       }
     }
   }

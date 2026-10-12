@@ -56,24 +56,106 @@ enum InvitationStatus {
   DECLINED
 }
 
+enum ProfileVisibility {
+  PUBLIC
+  TEAM
+  PRIVATE
+}
+
+enum ContributionStatus {
+  DRAFT
+  SUBMITTED
+  VERIFIED
+  REJECTED
+}
+
+enum ContributionVisibility {
+  PRIVATE
+  TEAM
+  PUBLIC
+}
+
+enum ContributionWorkSize {
+  SMALL
+  MEDIUM
+  LARGE
+}
+
+enum ContributionEvidenceType {
+  REPOSITORY
+  DEMO
+  DOCUMENT
+  OTHER
+}
+
+enum PointTransactionType {
+  AWARD
+  REVERSAL
+  REDEMPTION
+  REFUND
+}
+
+enum RewardStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum RewardRedemptionStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  FULFILLED
+  CANCELLED
+}
+
+enum ProjectMilestoneStatus {
+  TODO
+  IN_PROGRESS
+  BLOCKED
+  IN_REVIEW
+  COMPLETED
+}
+
+enum ProjectTaskStatus {
+  TODO
+  IN_PROGRESS
+  BLOCKED
+  IN_REVIEW
+  COMPLETED
+}
+
+enum TaskSubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model CollaborationProfile {
-  id           String   @id @default(uuid())
-  coreUserId   String   @unique @map("core_user_id")
+  id           String   @id @default(uuid()) @db.Uuid
+  coreUserId   String   @unique @map("core_user_id") @db.VarChar(64)
   skills       String[] @default([])
   githubUrl    String?  @map("github_url")
   linkedinUrl  String?  @map("linkedin_url")
   contactText  String?  @map("contact_text")
   isAvailable  Boolean  @default(true) @map("is_available")
+  bio          String?
+  visibility   ProfileVisibility @default(PRIVATE)
+  isDiscoverable Boolean @default(false) @map("is_discoverable")
+  showContributionPoints Boolean @default(false) @map("show_contribution_points")
+  profileViewsEnabled Boolean @default(false) @map("profile_views_enabled")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
   portfolio    PortfolioItem[]
+  contributions ContributionWork[]
+  profileViews ProfileViewEvent[] @relation("ViewedProfile")
 
   @@map("collaboration_profiles")
 }
 
 model PortfolioItem {
-  id         String   @id @default(uuid())
-  coreUserId String   @map("core_user_id")
+  id         String   @id @default(uuid()) @db.Uuid
+  coreUserId String   @map("core_user_id") @db.VarChar(64)
   imageId    String   @map("image_id")
   caption    String?
   createdAt  DateTime @default(now()) @map("created_at")
@@ -85,8 +167,8 @@ model PortfolioItem {
 }
 
 model Project {
-  id          String        @id @default(uuid())
-  coreUserId  String        @map("core_user_id")
+  id          String        @id @default(uuid()) @db.Uuid
+  coreUserId  String        @map("core_user_id") @db.VarChar(64)
   title       String
   kind        ProjectKind
   origin      ProjectOrigin    @default(UNSPECIFIED)
@@ -111,6 +193,10 @@ model Project {
   follows     ProjectFollow[]
   questions   ProjectQuestion[]
   reviews     ProjectReview[]
+  contributions ContributionWork[]
+  milestones  ProjectMilestone[]
+  tasks       ProjectTask[]
+  progressEvents ProjectProgressEvent[]
 
   @@index([coreUserId])
   @@index([status])
@@ -119,8 +205,8 @@ model Project {
 }
 
 model ProjectRole {
-  id        String  @id @default(uuid())
-  projectId String  @map("project_id")
+  id        String  @id @default(uuid()) @db.Uuid
+  projectId String  @map("project_id") @db.Uuid
   role      String
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
@@ -129,8 +215,8 @@ model ProjectRole {
 }
 
 model ProjectSkill {
-  id        String  @id @default(uuid())
-  projectId String  @map("project_id")
+  id        String  @id @default(uuid()) @db.Uuid
+  projectId String  @map("project_id") @db.Uuid
   skill     String
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
@@ -140,9 +226,9 @@ model ProjectSkill {
 }
 
 model ProjectMember {
-  id         String   @id @default(uuid())
-  projectId  String   @map("project_id")
-  coreUserId String   @map("core_user_id")
+  id         String   @id @default(uuid()) @db.Uuid
+  projectId  String   @map("project_id") @db.Uuid
+  coreUserId String   @map("core_user_id") @db.VarChar(64)
   role       String
   message    String?
   joinedAt   DateTime @default(now()) @map("joined_at")
@@ -156,9 +242,9 @@ model ProjectMember {
 }
 
 model ProjectApplication {
-  id         String            @id @default(uuid())
-  projectId  String            @map("project_id")
-  coreUserId String            @map("core_user_id")
+  id         String            @id @default(uuid()) @db.Uuid
+  projectId  String            @map("project_id") @db.Uuid
+  coreUserId String            @map("core_user_id") @db.VarChar(64)
   role       String?
   message    String?
   status     ApplicationStatus @default(PENDING)
@@ -172,9 +258,9 @@ model ProjectApplication {
 }
 
 model ProjectInvitation {
-  id                String           @id @default(uuid())
-  projectId         String           @map("project_id")
-  inviteeCoreUserId String           @map("invitee_core_user_id")
+  id                String           @id @default(uuid()) @db.Uuid
+  projectId         String           @map("project_id") @db.Uuid
+  inviteeCoreUserId String           @map("invitee_core_user_id") @db.VarChar(64)
   role              String?
   status            InvitationStatus @default(PENDING)
   createdAt         DateTime         @default(now()) @map("created_at")
@@ -187,9 +273,9 @@ model ProjectInvitation {
 }
 
 model ProjectFollow {
-  id         String   @id @default(uuid())
-  projectId  String   @map("project_id")
-  coreUserId String   @map("core_user_id")
+  id         String   @id @default(uuid()) @db.Uuid
+  projectId  String   @map("project_id") @db.Uuid
+  coreUserId String   @map("core_user_id") @db.VarChar(64)
   createdAt  DateTime @default(now()) @map("created_at")
   project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
@@ -199,9 +285,9 @@ model ProjectFollow {
 }
 
 model ProjectQuestion {
-  id            String   @id @default(uuid())
-  projectId     String   @map("project_id")
-  askerCoreUserId String @map("asker_core_user_id")
+  id            String   @id @default(uuid()) @db.Uuid
+  projectId     String   @map("project_id") @db.Uuid
+  askerCoreUserId String @map("asker_core_user_id") @db.VarChar(64)
   question      String
   answer        String?
   answeredAt    DateTime? @map("answered_at")
@@ -215,10 +301,10 @@ model ProjectQuestion {
 }
 
 model ProjectReview {
-  id           String   @id @default(uuid())
-  projectId    String   @map("project_id")
-  fromCoreUserId String @map("from_core_user_id")
-  toCoreUserId String   @map("to_core_user_id")
+  id           String   @id @default(uuid()) @db.Uuid
+  projectId    String   @map("project_id") @db.Uuid
+  fromCoreUserId String @map("from_core_user_id") @db.VarChar(64)
+  toCoreUserId String   @map("to_core_user_id") @db.VarChar(64)
   stars        Int
   comment      String?
   createdAt    DateTime @default(now()) @map("created_at")
@@ -230,7 +316,7 @@ model ProjectReview {
 }
 
 model Conversation {
-  id         String   @id @default(uuid())
+  id         String   @id @default(uuid()) @db.Uuid
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
   participants ConversationParticipant[]
@@ -240,9 +326,9 @@ model Conversation {
 }
 
 model ConversationParticipant {
-  id             String       @id @default(uuid())
-  conversationId String       @map("conversation_id")
-  coreUserId     String       @map("core_user_id")
+  id             String       @id @default(uuid()) @db.Uuid
+  conversationId String       @map("conversation_id") @db.Uuid
+  coreUserId     String       @map("core_user_id") @db.VarChar(64)
   createdAt      DateTime     @default(now()) @map("created_at")
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
@@ -252,9 +338,9 @@ model ConversationParticipant {
 }
 
 model Message {
-  id             String       @id @default(uuid())
-  conversationId String       @map("conversation_id")
-  senderCoreUserId String     @map("sender_core_user_id")
+  id             String       @id @default(uuid()) @db.Uuid
+  conversationId String       @map("conversation_id") @db.Uuid
+  senderCoreUserId String     @map("sender_core_user_id") @db.VarChar(64)
   body           String
   createdAt      DateTime     @default(now()) @map("created_at")
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
@@ -265,11 +351,11 @@ model Message {
 }
 
 model Notification {
-  id           String   @id @default(uuid())
-  coreUserId   String   @map("core_user_id")
+  id           String   @id @default(uuid()) @db.Uuid
+  coreUserId   String   @map("core_user_id") @db.VarChar(64)
   type         String
-  projectId    String?  @map("project_id")
-  actorCoreUserId String? @map("actor_core_user_id")
+  projectId    String?  @map("project_id") @db.Uuid
+  actorCoreUserId String? @map("actor_core_user_id") @db.VarChar(64)
   message      String
   isRead       Boolean  @default(false) @map("is_read")
   createdAt    DateTime @default(now()) @map("created_at")
@@ -277,4 +363,198 @@ model Notification {
 
   @@index([coreUserId, isRead, createdAt])
   @@map("notifications")
+}
+
+
+model ProfileViewEvent {
+  id               String   @id @default(uuid()) @db.Uuid
+  viewerCoreUserId String   @map("viewer_core_user_id") @db.VarChar(64)
+  viewedCoreUserId String   @map("viewed_core_user_id") @db.VarChar(64)
+  createdAt        DateTime @default(now()) @map("created_at")
+  viewedProfile    CollaborationProfile @relation("ViewedProfile", fields: [viewedCoreUserId], references: [coreUserId], onDelete: Cascade)
+
+  @@index([viewedCoreUserId, createdAt])
+  @@index([viewerCoreUserId, viewedCoreUserId, createdAt])
+  @@map("profile_view_events")
+}
+
+model ContributionWork {
+  id                    String   @id @default(uuid()) @db.Uuid
+  coreUserId            String   @map("core_user_id") @db.VarChar(64)
+  projectId             String?  @map("project_id") @db.Uuid
+  title                 String   @db.VarChar(160)
+  description           String   @db.VarChar(3000)
+  role                  String   @db.VarChar(120)
+  skills                String[] @default([])
+  workSize              ContributionWorkSize @default(SMALL) @map("work_size")
+  repositoryUrl         String?  @map("repository_url") @db.VarChar(500)
+  demoUrl               String?  @map("demo_url") @db.VarChar(500)
+  status                ContributionStatus @default(DRAFT)
+  visibility            ContributionVisibility @default(PRIVATE)
+  reviewNote            String?  @map("review_note") @db.VarChar(1000)
+  submittedAt           DateTime? @map("submitted_at")
+  verifiedByCoreUserId  String?  @map("verified_by_core_user_id") @db.VarChar(64)
+  verifiedAt            DateTime? @map("verified_at")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+  profile               CollaborationProfile @relation(fields: [coreUserId], references: [coreUserId], onDelete: Cascade)
+  project               Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  evidence              ContributionEvidence[]
+  pointTransactions     ContributionPointTransaction[]
+
+  @@index([coreUserId, createdAt])
+  @@index([projectId, status])
+  @@index([visibility, status])
+  @@map("contribution_works")
+}
+
+model ContributionEvidence {
+  id                    String   @id @default(uuid()) @db.Uuid
+  contributionId        String   @map("contribution_id") @db.Uuid
+  evidenceType          ContributionEvidenceType @default(OTHER) @map("evidence_type")
+  url                   String   @db.VarChar(1000)
+  caption               String?  @db.VarChar(300)
+  createdByCoreUserId   String   @map("created_by_core_user_id") @db.VarChar(64)
+  createdAt             DateTime @default(now()) @map("created_at")
+  contribution          ContributionWork @relation(fields: [contributionId], references: [id], onDelete: Cascade)
+
+  @@index([contributionId, createdAt])
+  @@map("contribution_evidence")
+}
+
+model ContributionPointTransaction {
+  id                    String   @id @default(uuid()) @db.Uuid
+  coreUserId            String   @map("core_user_id") @db.VarChar(64)
+  contributionId        String?  @map("contribution_id") @db.Uuid
+  points                Int
+  transactionType       PointTransactionType @map("transaction_type")
+  reason                String   @db.VarChar(300)
+  eventKey              String   @unique @map("event_key") @db.VarChar(200)
+  redemptionId          String?  @unique @map("redemption_id") @db.Uuid
+  createdByCoreUserId   String   @map("created_by_core_user_id") @db.VarChar(64)
+  createdAt              DateTime @default(now()) @map("created_at")
+  contribution          ContributionWork? @relation(fields: [contributionId], references: [id], onDelete: SetNull)
+  redemption            RewardRedemption? @relation("RedemptionTransaction", fields: [redemptionId], references: [id], onDelete: SetNull)
+
+  @@index([coreUserId, createdAt])
+  @@index([contributionId])
+  @@map("contribution_point_transactions")
+}
+
+model RewardCatalog {
+  id                String       @id @default(uuid()) @db.Uuid
+  name              String       @db.VarChar(120)
+  description       String       @db.VarChar(1000)
+  category          String       @db.VarChar(60)
+  pointCost         Int          @map("point_cost")
+  remainingQuantity Int?         @map("remaining_quantity")
+  status            RewardStatus @default(DRAFT)
+  createdByCoreUserId String?    @map("created_by_core_user_id") @db.VarChar(64)
+  activatedByCoreUserId String?  @map("activated_by_core_user_id") @db.VarChar(64)
+  activatedAt       DateTime?    @map("activated_at")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
+  redemptions       RewardRedemption[]
+
+  @@index([status, category])
+  @@map("reward_catalog")
+}
+
+model RewardRedemption {
+  id                   String                 @id @default(uuid()) @db.Uuid
+  rewardId             String                 @map("reward_id") @db.Uuid
+  coreUserId           String                 @map("core_user_id") @db.VarChar(64)
+  status               RewardRedemptionStatus @default(REQUESTED)
+  pointCost            Int                    @map("point_cost")
+  requestNote          String?                @map("request_note") @db.VarChar(500)
+  reviewNote           String?                @map("review_note") @db.VarChar(500)
+  reviewedByCoreUserId String?                @map("reviewed_by_core_user_id") @db.VarChar(64)
+  reviewedAt           DateTime?              @map("reviewed_at")
+  fulfilledAt          DateTime?              @map("fulfilled_at")
+  fulfilledByCoreUserId String?               @map("fulfilled_by_core_user_id") @db.VarChar(64)
+  createdAt            DateTime               @default(now()) @map("created_at")
+  updatedAt            DateTime               @updatedAt @map("updated_at")
+  reward               RewardCatalog          @relation(fields: [rewardId], references: [id], onDelete: Restrict)
+  transaction          ContributionPointTransaction? @relation("RedemptionTransaction")
+
+  @@index([coreUserId, status, createdAt])
+  @@index([rewardId, status])
+  @@map("reward_redemptions")
+}
+
+model ProjectMilestone {
+  id                  String   @id @default(uuid()) @db.Uuid
+  projectId           String   @map("project_id") @db.Uuid
+  title               String   @db.VarChar(160)
+  description         String?  @db.VarChar(2000)
+  dueAt               DateTime? @map("due_at")
+  status              ProjectMilestoneStatus @default(TODO)
+  weight              Int      @default(1)
+  createdByCoreUserId String   @map("created_by_core_user_id") @db.VarChar(64)
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  project             Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks               ProjectTask[]
+
+  @@index([projectId, status])
+  @@map("project_milestones")
+}
+
+model ProjectTask {
+  id                  String   @id @default(uuid()) @db.Uuid
+  projectId           String   @map("project_id") @db.Uuid
+  milestoneId         String?  @map("milestone_id") @db.Uuid
+  title               String   @db.VarChar(160)
+  description         String?  @db.VarChar(2000)
+  progressNote        String?  @map("progress_note") @db.VarChar(2000)
+  blockerNote         String?  @map("blocker_note") @db.VarChar(1000)
+  assignedCoreUserId  String?  @map("assigned_core_user_id") @db.VarChar(64)
+  dueAt               DateTime? @map("due_at")
+  status              ProjectTaskStatus @default(TODO)
+  workSize            ContributionWorkSize @default(SMALL) @map("work_size")
+  weight              Int      @default(1)
+  createdByCoreUserId String   @map("created_by_core_user_id") @db.VarChar(64)
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  project             Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  milestone           ProjectMilestone? @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  submissions         TaskSubmission[]
+
+  @@index([projectId, status])
+  @@index([assignedCoreUserId, status])
+  @@index([milestoneId])
+  @@map("project_tasks")
+}
+
+model ProjectProgressEvent {
+  id         String   @id @default(uuid()) @db.Uuid
+  projectId  String   @map("project_id") @db.Uuid
+  actorCoreUserId String @map("actor_core_user_id") @db.VarChar(64)
+  entityId   String?  @map("entity_id") @db.Uuid
+  eventType  String   @map("event_type") @db.VarChar(40)
+  message    String   @db.VarChar(500)
+  createdAt  DateTime @default(now()) @map("created_at")
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, createdAt])
+  @@index([entityId, createdAt])
+  @@map("project_progress_events")
+}
+
+model TaskSubmission {
+  id                    String   @id @default(uuid()) @db.Uuid
+  taskId                String   @map("task_id") @db.Uuid
+  submittedByCoreUserId String   @map("submitted_by_core_user_id") @db.VarChar(64)
+  url                   String?  @db.VarChar(1000)
+  note                  String   @db.VarChar(2000)
+  status                TaskSubmissionStatus @default(PENDING)
+  reviewedByCoreUserId  String?  @map("reviewed_by_core_user_id") @db.VarChar(64)
+  reviewNote            String?  @map("review_note") @db.VarChar(1000)
+  submittedAt           DateTime @default(now()) @map("submitted_at")
+  reviewedAt            DateTime? @map("reviewed_at")
+  task                  ProjectTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId, status])
+  @@index([submittedByCoreUserId, submittedAt])
+  @@map("task_submissions")
 }

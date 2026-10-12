@@ -134,6 +134,18 @@ export interface components {
       participants: components["schemas"]["ConversationParticipant"][];
       messages: components["schemas"]["Message"][];
     };
+    UpdatePrivacyDto: { bio?: string | null; visibility?: "PUBLIC" | "TEAM" | "PRIVATE"; isDiscoverable?: boolean; showContributionPoints?: boolean; profileViewsEnabled?: boolean };
+    CreateContributionDto: { title: string; description: string; role: string; skills?: string[]; workSize: "SMALL" | "MEDIUM" | "LARGE"; projectId?: string; repositoryUrl?: string; demoUrl?: string; visibility?: "PRIVATE" | "TEAM" | "PUBLIC" };
+    AddEvidenceDto: { evidenceType: "REPOSITORY" | "DEMO" | "DOCUMENT" | "OTHER"; url: string; caption?: string };
+    ReviewContributionDto: { decision: "APPROVE" | "REJECT"; reviewNote?: string };
+    CreateMilestoneDto: { title: string; description?: string; dueAt?: string; weight?: number };
+    UpdateMilestoneDto: { title?: string; description?: string | null; dueAt?: string | null; status?: "TODO" | "IN_PROGRESS" | "BLOCKED" | "COMPLETED"; weight?: number };
+    CreateTaskDto: { title: string; description?: string; milestoneId?: string; assignedCoreUserId?: string; dueAt?: string; workSize: "SMALL" | "MEDIUM" | "LARGE"; weight?: number };
+    UpdateTaskDto: { title?: string; description?: string | null; progressNote?: string | null; blockerNote?: string | null; assignedCoreUserId?: string | null; dueAt?: string | null; status?: "TODO" | "IN_PROGRESS" | "BLOCKED"; weight?: number };
+    TaskSubmissionDto: { url: string; note: string };
+    ReviewTaskSubmissionDto: { decision: "APPROVE" | "REJECT"; reviewNote?: string };
+    CreateRewardDto: { name: string; description: string; category: string; pointCost: number; quantity?: number | null };
+    CreateRedemptionDto: { requestNote?: string };
   };
 }
 

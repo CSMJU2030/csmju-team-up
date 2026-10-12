@@ -92,6 +92,17 @@ session เป็น Core Hub access token ใน HttpOnly cookie ของร�
 
 Business API อยู่ใต้ `/api/v1/*`; health คือ `/api/health`
 
+## โปรไฟล์ผลงาน ความคืบหน้า และรางวัล
+
+- โปรไฟล์สมาชิกเริ่มเป็น `PRIVATE`, ไม่อยู่ใน directory และซ่อนแต้ม; สมาชิกเลือกเปิด public profile, portfolio และแต้มได้เอง
+- Contribution ที่แนบหลักฐานและได้รับการตรวจยืนยันเท่านั้นจึงได้แต้มและแสดงบน passport ตาม visibility
+- ความคืบหน้าโครงการเปิดให้เจ้าของและสมาชิกทีมเท่านั้น งานต้องมอบหมายให้สมาชิก ส่ง URL หลักฐาน และผ่านการตรวจจากเจ้าของก่อนนับความคืบหน้าหรือให้แต้ม
+- แต้มสำหรับงาน, milestone และ project completion ปรับได้จาก `CONTRIBUTION_POINTS_*` ใน `backend/.env`; แต้ม milestone/project ให้เฉพาะสมาชิกที่มีงานมอบหมายซึ่งผ่านการตรวจแล้ว
+- ตัวอย่าง reward ถูก seed เป็น `DRAFT`; route จัดการ/อนุมัติมี permission แยก แต่ยังไม่ผูก permission นี้กับ role ใด จนกว่าสาขาจะกำหนดผู้รับผิดชอบ การแลกจะหักแต้มไว้ก่อนและคืนเมื่อยกเลิกหรือไม่อนุมัติ
+- ใช้ `pnpm db:migrate` เพื่อ deploy additive migrations; ห้าม reset ฐานข้อมูลที่มีข้อมูลจริง
+
+รายละเอียด endpoint, สถานะ reward และจุดกำหนดสิทธิ์อยู่ใน [docs/teamup-features.md](./docs/teamup-features.md)
+
 สร้าง OpenAPI จากโค้ดหลัง dependency ติดตั้งแล้ว:
 
 ```bash

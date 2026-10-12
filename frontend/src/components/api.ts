@@ -2,7 +2,14 @@ import type { components } from "@/generated/api";
 
 export type Project = components["schemas"]["Project"];
 export type Me = components["schemas"]["Me"];
-export type Profile = components["schemas"]["Profile"];
+export type ProfileRecord = Exclude<components["schemas"]["Profile"], null> & {
+  bio?: string | null;
+  visibility?: "PUBLIC" | "TEAM" | "PRIVATE";
+  isDiscoverable?: boolean;
+  showContributionPoints?: boolean;
+  profileViewsEnabled?: boolean;
+};
+export type Profile = ProfileRecord | null;
 export type Notification = components["schemas"]["Notification"];
 export type Conversation = components["schemas"]["Conversation"];
 export type ApiErrorBody = { success: false; error: { code: string; message: string; details?: unknown } };

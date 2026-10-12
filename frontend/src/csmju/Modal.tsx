@@ -8,10 +8,12 @@ export default function Modal({
   title,
   onClose,
   children,
+  size = "default",
 }: {
   title: string;
   onClose: () => void;
   children: React.ReactNode;
+  size?: "default" | "wide";
 }) {
   const titleId = useId();
 
@@ -30,7 +32,7 @@ export default function Modal({
         role="dialog"
         aria-modal
         aria-labelledby={titleId}
-        className="fade-slide-up relative w-full max-w-md rounded-xl bg-surface-container-lowest p-6 shadow-xl"
+        className={`fade-slide-up relative max-h-[calc(100dvh-2rem)] w-full overflow-y-auto rounded-xl bg-surface-container-lowest p-6 shadow-xl ${size === "wide" ? "max-w-2xl" : "max-w-md"}`}
       >
         <div className="mb-5 flex items-start justify-between gap-4">
           <h3 id={titleId} className="font-display text-headline-md text-on-surface">

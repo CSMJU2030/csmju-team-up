@@ -10,6 +10,9 @@ const NAV: NavItem[] = [
   { label: "ค้นหาโปรเจกต์", labelEn: "Projects", href: "/", icon: "dashboard" },
   { label: "Dashboard", labelEn: "Overview", href: "/dashboard", icon: "group" },
   { label: "ข้อความ", labelEn: "Messages", href: "/messages", icon: "campaign" },
+  { label: "สมาชิก", labelEn: "Members", href: "/people", icon: "group" },
+  { label: "ผลงานและแต้ม", labelEn: "Contributions", href: "/contributions", icon: "description" },
+  { label: "รางวัล", labelEn: "Rewards", href: "/rewards", icon: "campaign" },
   { label: "โปรไฟล์", labelEn: "Profile", href: "/profile", icon: "settings" },
 ];
 
